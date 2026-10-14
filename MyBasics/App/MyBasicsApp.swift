@@ -6,8 +6,9 @@ struct MyBasicsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PlaceholderHomeView()
+            RootView(environment: environment)
                 .environment(environment)
+                .environment(\.locale, CurrencyFormatter.locale)
         }
     }
 }

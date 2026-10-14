@@ -23,10 +23,12 @@ final class AppEnvironment {
     }
 
     /// Todo en memoria, sin red. Es el default de la app por ahora.
-    static func mock() -> AppEnvironment {
+    /// `withSampleData: false` arranca vacío (útil para ver el estado vacío).
+    static func mock(withSampleData: Bool = true) -> AppEnvironment {
         let categories = MockCategoryRepository()
+        let expenses = withSampleData ? MockData.expenses(categories: categories.categories) : []
         return AppEnvironment(
-            expenseRepository: MockExpenseRepository(categories: { categories.categories }),
+            expenseRepository: MockExpenseRepository(expenses: expenses, categories: { categories.categories }),
             categoryRepository: categories,
             authService: MockAuthService()
         )
