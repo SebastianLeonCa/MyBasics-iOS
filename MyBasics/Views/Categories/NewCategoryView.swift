@@ -118,7 +118,7 @@ struct NewCategoryView: View {
                 try await onSave(Category(name: trimmedName, colorHex: colorHex, icon: icon))
                 dismiss()
             } catch {
-                errorMessage = error.localizedDescription
+                errorMessage = UserFacingError.describe(error)
             }
         }
     }

@@ -107,6 +107,36 @@
         }
       }
     },
+    "Cargando categorías": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading categories"
+          }
+        }
+      }
+    },
+    "Cargando gastos": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading expenses"
+          }
+        }
+      }
+    },
+    "Cargando…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading…"
+          }
+        }
+      }
+    },
     "Categoría": {
       "localizations": {
         "en": {
@@ -179,12 +209,32 @@
         }
       }
     },
+    "Conectando…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting…"
+          }
+        }
+      }
+    },
     "Cuando compartas un gasto con alguien, aparecerá aquí hasta que se pague.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "When you share an expense with someone, it will show here until it’s paid."
+          }
+        }
+      }
+    },
+    "Datos": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Data"
           }
         }
       }
@@ -239,12 +289,42 @@
         }
       }
     },
-    "El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app.": {
+    "Ejemplo (sin conexión)": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Change the language in iOS Settings › MyBasics › Language. Sample data lives in memory and resets when you close the app."
+            "value": "Sample (offline)"
+          }
+        }
+      }
+    },
+    "El idioma se cambia en Ajustes de iOS › MyBasics › Idioma.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change the language in iOS Settings › MyBasics › Language."
+          }
+        }
+      }
+    },
+    "El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app. Completa Config/Secrets.xcconfig para usar Supabase.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change the language in iOS Settings › MyBasics › Language. Sample data lives in memory and resets when you close the app. Fill in Config/Secrets.xcconfig to use Supabase."
+          }
+        }
+      }
+    },
+    "El servidor tardó demasiado en responder.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server took too long to respond."
           }
         }
       }
@@ -381,6 +461,26 @@
         }
       }
     },
+    "La base de datos no está configurada. Ejecuta supabase/schema.sql en Supabase.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The database isn’t set up. Run supabase/schema.sql in Supabase."
+          }
+        }
+      }
+    },
+    "La respuesta del servidor no tiene el formato esperado.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The server response wasn’t in the expected format."
+          }
+        }
+      }
+    },
     "Le debes %@": {
       "localizations": {
         "en": {
@@ -491,6 +591,36 @@
         }
       }
     },
+    "No se pudo cargar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t load"
+          }
+        }
+      }
+    },
+    "No se pudo conectar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t connect"
+          }
+        }
+      }
+    },
+    "No se pudo conectar con el servidor. Revisa SUPABASE_URL.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t reach the server. Check SUPABASE_URL."
+          }
+        }
+      }
+    },
     "No se pudo crear la categoría": {
       "localizations": {
         "en": {
@@ -501,32 +631,52 @@
         }
       }
     },
-    "No se pudo eliminar el gasto. %@": {
+    "No se pudo eliminar el gasto": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t delete the expense. %@"
+            "value": "Couldn’t delete the expense"
           }
         }
       }
     },
-    "No se pudo guardar. %@": {
+    "No se pudo guardar el gasto": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t save. %@"
+            "value": "Couldn’t save the expense"
           }
         }
       }
     },
-    "No se pudo marcar como pagado. %@": {
+    "No se pudo iniciar sesión con el usuario de prueba (%@). Revisa DEV_USER_EMAIL y DEV_USER_PASSWORD.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t mark as paid. %@"
+            "value": "Couldn’t sign in with the test user (%@). Check DEV_USER_EMAIL and DEV_USER_PASSWORD."
+          }
+        }
+      }
+    },
+    "No se pudo marcar como pagado": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t mark as paid"
+          }
+        }
+      }
+    },
+    "No tienes permiso para hacer esto.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You don’t have permission to do this."
           }
         }
       }
@@ -655,6 +805,16 @@
         }
       }
     },
+    "Reintentar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        }
+      }
+    },
     "Salud": {
       "comment": "Nombre de categoría por defecto",
       "extractionState": "manual",
@@ -683,6 +843,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "No charges in the last %lld days."
+          }
+        }
+      }
+    },
+    "Sin conexión a internet. Revisa tu conexión e inténtalo de nuevo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No internet connection. Check your connection and try again."
           }
         }
       }
@@ -868,6 +1038,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Variable"
+          }
+        }
+      }
+    },
+    "Ya existe una categoría con ese nombre.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A category with that name already exists."
           }
         }
       }

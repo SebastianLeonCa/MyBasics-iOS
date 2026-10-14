@@ -22,7 +22,11 @@ struct SharedView: View {
                     .listRowBackground(Color.clear)
                 }
 
-                if viewModel.hasLoaded && viewModel.shares.isEmpty {
+                if let loadError = viewModel.loadError {
+                    LoadErrorView(message: loadError) { await viewModel.load() }
+                } else if !viewModel.hasLoaded {
+                    Section { SkeletonRows(count: 3) }
+                } else if viewModel.shares.isEmpty {
                     ContentUnavailableView(
                         "Todo al día",
                         systemImage: "checkmark.circle",
@@ -42,14 +46,7 @@ struct SharedView: View {
             }
             .navigationTitle("Compartidos")
             .task { await viewModel.load() }
-            .alert(
-                "Algo salió mal",
-                isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } })
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+            .errorAlert($viewModel.alert)
         }
     }
 

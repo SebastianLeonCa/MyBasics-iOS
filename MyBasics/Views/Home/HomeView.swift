@@ -13,7 +13,17 @@ struct HomeView: View {
             List {
                 summarySection
 
-                if viewModel.hasLoaded && viewModel.filteredExpenses.isEmpty {
+                if let loadError = viewModel.loadError {
+                    Section {
+                        LoadErrorView(message: loadError) { await viewModel.load() }
+                    }
+                } else if viewModel.isShowingSkeleton {
+                    Section {
+                        SkeletonRows()
+                    } header: {
+                        Text("Cargando…")
+                    }
+                } else if viewModel.filteredExpenses.isEmpty {
                     emptyState
                 } else {
                     ForEach(viewModel.daySections) { section in
@@ -68,14 +78,7 @@ struct HomeView: View {
             } message: { expense in
                 Text("\(expense.displayTitle) · \(CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency))")
             }
-            .alert(
-                "Algo salió mal",
-                isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } })
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+            .errorAlert($viewModel.alert)
         }
     }
 
@@ -99,7 +102,12 @@ struct HomeView: View {
                 }
                 .pickerStyle(.segmented)
 
-                if viewModel.categoryTotals.isEmpty {
+                if viewModel.isShowingSkeleton {
+                    ProgressView()
+                        .frame(height: 240)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityLabel("Cargando gastos")
+                } else if viewModel.categoryTotals.isEmpty {
                     emptyDonut
                 } else {
                     DonutChartView(

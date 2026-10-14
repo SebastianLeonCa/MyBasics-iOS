@@ -16,6 +16,9 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    LabeledContent("Datos") {
+                        Text(env.dataSource == .supabase ? "Supabase" : String(localized: "Ejemplo (sin conexión)"))
+                    }
                     LabeledContent("Moneda", value: env.currency)
                     Button {
                         // Abre los ajustes de la app en iOS, donde se elige el idioma de la app.
@@ -25,7 +28,11 @@ struct SettingsView: View {
                     }
                     .foregroundStyle(.primary)
                 } footer: {
-                    Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app.")
+                    if env.dataSource == .supabase {
+                        Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma.")
+                    } else {
+                        Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app. Completa Config/Secrets.xcconfig para usar Supabase.")
+                    }
                 }
             }
             .navigationTitle("Ajustes")

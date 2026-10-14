@@ -10,6 +10,11 @@ struct CategoriesView: View {
 
     var body: some View {
         List {
+            if let loadError = viewModel.loadError {
+                LoadErrorView(message: loadError) { await viewModel.load() }
+            } else if !viewModel.hasLoaded {
+                SkeletonRows(count: 4)
+            }
             ForEach(viewModel.categories) { category in
                 HStack(spacing: 12) {
                     CategoryIcon(category: category, size: 32)

@@ -4,7 +4,8 @@ import SwiftUI
 /// monto con foco automático → tocar categoría → Guardar.
 struct AddExpenseView: View {
     @State private var viewModel: AddExpenseViewModel
-    let onSaved: (Expense) -> Void
+    /// Recibe el gasto armado; quien lo presenta lo guarda (de forma optimista).
+    let onSubmit: (Expense) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @FocusState private var focusedField: Field?
@@ -12,9 +13,9 @@ struct AddExpenseView: View {
 
     private enum Field { case amount, note, debtPerson, debtAmount }
 
-    init(viewModel: AddExpenseViewModel, onSaved: @escaping (Expense) -> Void) {
+    init(viewModel: AddExpenseViewModel, onSubmit: @escaping (Expense) -> Void) {
         _viewModel = State(initialValue: viewModel)
-        self.onSaved = onSaved
+        self.onSubmit = onSubmit
     }
 
     var body: some View {
@@ -23,12 +24,27 @@ struct AddExpenseView: View {
                 amountSection
 
                 Section("Categoría") {
-                    CategoryChipsView(
-                        categories: viewModel.categories,
-                        selection: $viewModel.categoryId,
-                        onNew: { showingNewCategory = true }
-                    )
-                    .listRowInsets(EdgeInsets())
+                    if let error = viewModel.categoriesError, viewModel.categories.isEmpty {
+                        HStack {
+                            Text(error)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Reintentar") { Task { await viewModel.loadCategories() } }
+                                .buttonStyle(.borderless)
+                        }
+                    } else if viewModel.isLoadingCategories && viewModel.categories.isEmpty {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .accessibilityLabel("Cargando categorías")
+                    } else {
+                        CategoryChipsView(
+                            categories: viewModel.categories,
+                            selection: $viewModel.categoryId,
+                            onNew: { showingNewCategory = true }
+                        )
+                        .listRowInsets(EdgeInsets())
+                    }
                 }
 
                 Section {
@@ -70,14 +86,7 @@ struct AddExpenseView: View {
                     try await viewModel.addCategory(category)
                 }
             }
-            .alert(
-                "Algo salió mal",
-                isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } })
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+            .errorAlert($viewModel.alert)
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
@@ -148,11 +157,8 @@ struct AddExpenseView: View {
     }
 
     private func save() {
-        Task {
-            if let saved = await viewModel.save() {
-                onSaved(saved)
-                dismiss()
-            }
-        }
+        guard viewModel.canSave, let expense = viewModel.makeExpense() else { return }
+        onSubmit(expense)
+        dismiss()
     }
 }

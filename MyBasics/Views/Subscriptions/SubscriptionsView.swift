@@ -31,7 +31,11 @@ struct SubscriptionsView: View {
                     .accessibilityElement(children: .combine)
                 }
 
-                if viewModel.hasLoaded && viewModel.summaries.isEmpty {
+                if let loadError = viewModel.loadError {
+                    LoadErrorView(message: loadError) { await viewModel.load() }
+                } else if !viewModel.hasLoaded {
+                    Section { SkeletonRows(count: 3) }
+                } else if viewModel.summaries.isEmpty {
                     ContentUnavailableView(
                         "Sin suscripciones",
                         systemImage: "repeat.circle",
@@ -56,14 +60,7 @@ struct SubscriptionsView: View {
             }
             .navigationTitle("Suscripciones")
             .task { await viewModel.load() }
-            .alert(
-                "Algo salió mal",
-                isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } })
-            ) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
+
         }
     }
 
