@@ -55,24 +55,77 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertNil(vm.selectedCategoryId)
     }
 
-    func testDidSaveAndDeleteUpdateImmediately() async throws {
+    func testSaveAndDeletePersistAndUpdateImmediately() async throws {
         let (vm, repo) = makeViewModel()
         await vm.load()
 
-        let created = try await repo.create(F.expense(F.food, units: 3_000, at: F.date(2026, 10, 13)))
-        vm.didSave(created)
+        let created = F.expense(F.food, units: 3_000, at: F.date(2026, 10, 13))
+        await vm.save(created, isNew: true)
         XCTAssertEqual(vm.expenses.count, 3)
 
         var edited = created
         edited.spentAt = F.date(2026, 9, 1)   // movido a otro mes → desaparece de este
-        vm.didSave(edited)
+        await vm.save(edited, isNew: false)
         XCTAssertEqual(vm.expenses.count, 2)
+        let september = try await repo.fetchExpenses(in: F.date(2026, 9, 1).monthInterval())
+        XCTAssertTrue(september.contains { $0.id == created.id }, "el repositorio tiene la edición")
 
         let toDelete = try XCTUnwrap(vm.expenses.first)
         await vm.delete(toDelete)
         XCTAssertEqual(vm.expenses.count, 1)
         let stored = try await repo.fetchExpenses(in: now.monthInterval())
         XCTAssertFalse(stored.contains { $0.id == toDelete.id })
+        XCTAssertNil(vm.alert)
+    }
+
+    func testOptimisticSaveRollsBackAndOffersRetry() async throws {
+        let repo = FlakyExpenseRepository(expenses: [F.expense(F.food, units: 10, at: F.date(2026, 10, 2))])
+        let now = self.now
+        let vm = HomeViewModel(repository: repo, now: { now })
+        await vm.load()
+        let original = try XCTUnwrap(vm.expenses.first)
+
+        repo.failWrites = true
+        var edited = original
+        edited.amountCents = 99_900
+        await vm.save(edited, isNew: false)
+        XCTAssertEqual(vm.expenses.map(\.amountCents), [original.amountCents], "rollback a la versión anterior")
+        XCTAssertNotNil(vm.alert?.retry)
+
+        await vm.save(F.expense(F.food, units: 5, at: F.date(2026, 10, 3)), isNew: true)
+        XCTAssertEqual(vm.expenses.count, 1, "el gasto nuevo se quita si falla")
+
+        await vm.delete(original)
+        XCTAssertEqual(vm.expenses.count, 1, "el gasto eliminado vuelve si falla")
+
+        repo.failWrites = false
+        await vm.alert?.retry?()
+        XCTAssertEqual(vm.expenses.count, 0, "Reintentar repite la última acción (eliminar)")
+    }
+
+    func testFirstLoadErrorShowsErrorStateAndRetryRecovers() async {
+        let repo = FlakyExpenseRepository(expenses: [F.expense(F.food, units: 10, at: F.date(2026, 10, 2))])
+        repo.failReads = true
+        let now = self.now
+        let vm = HomeViewModel(repository: repo, now: { now })
+
+        XCTAssertTrue(vm.isShowingSkeleton)
+        await vm.load()
+        XCTAssertNotNil(vm.loadError)
+        XCTAssertFalse(vm.isShowingSkeleton)
+
+        repo.failReads = false
+        await vm.load()
+        XCTAssertNil(vm.loadError)
+        XCTAssertEqual(vm.expenses.count, 1)
+    }
+
+    func testChangingMonthClearsOldDataUntilLoaded() async {
+        let (vm, _) = makeViewModel()
+        await vm.load()
+        vm.showPreviousMonth()
+        XCTAssertTrue(vm.expenses.isEmpty)
+        XCTAssertTrue(vm.isShowingSkeleton)
     }
 }
 
@@ -83,7 +136,6 @@ final class AddExpenseViewModelTests: XCTestCase {
     private func makeViewModel(editing: Expense? = nil) -> AddExpenseViewModel {
         AddExpenseViewModel(
             editing: editing,
-            expenseRepository: MockExpenseRepository(categories: { [F.food] }),
             categoryRepository: MockCategoryRepository(categories: [F.food]),
             currency: "USD"
         )
@@ -149,7 +201,6 @@ final class AddExpenseViewModelTests: XCTestCase {
 final class AmountInputTests: XCTestCase {
     func testAmountFieldKeepsAtMostTwoDecimals() {
         let vm = AddExpenseViewModel(
-            expenseRepository: MockExpenseRepository(),
             categoryRepository: MockCategoryRepository(),
             currency: "USD")
         let sep = CurrencyFormatter.decimalSeparator()
@@ -160,7 +211,6 @@ final class AmountInputTests: XCTestCase {
 
     func testChoosingSubscriptionsMakesExpenseFixed() async {
         let vm = AddExpenseViewModel(
-            expenseRepository: MockExpenseRepository(),
             categoryRepository: MockCategoryRepository(),
             currency: "USD")
         await vm.loadCategories()
