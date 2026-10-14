@@ -1,10 +1,30 @@
 import SwiftUI
 
-enum AppTab: Hashable {
-    case home, settings
+enum AppTab: Hashable, CaseIterable {
+    case home, shared, subscriptions, settings
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .home: "Inicio"
+        case .shared: "Compartidos"
+        case .subscriptions: "Suscripciones"
+        case .settings: "Ajustes"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .home: "house"
+        case .shared: "person.2"
+        case .subscriptions: "repeat.circle"
+        case .settings: "gearshape"
+        }
+    }
+
+    var selectedIcon: String { icon + ".fill" }
 }
 
-/// Barra inferior: Inicio (izq), botón "+" redondo flotante (centro) y Ajustes (der).
+/// Barra inferior: dos pestañas a cada lado de un botón "+" redondo y flotante.
 struct CustomTabBar: View {
     @Binding var selection: AppTab
     let onAdd: () -> Void
@@ -12,12 +32,14 @@ struct CustomTabBar: View {
     @ScaledMetric(relativeTo: .title) private var plusSize: CGFloat = 64
 
     var body: some View {
-        HStack(alignment: .bottom) {
-            tabButton(.home, title: "Inicio", icon: "house")
-            Color.clear.frame(width: plusSize + 16, height: 1)
-            tabButton(.settings, title: "Ajustes", icon: "gearshape")
+        HStack(alignment: .bottom, spacing: 0) {
+            tabButton(.home)
+            tabButton(.shared)
+            Color.clear.frame(width: plusSize + 12, height: 1)
+            tabButton(.subscriptions)
+            tabButton(.settings)
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 8)
         .padding(.top, 8)
         .background(alignment: .top) {
             Rectangle()
@@ -41,15 +63,17 @@ struct CustomTabBar: View {
         .accessibilityLabel("Nuevo gasto")
     }
 
-    private func tabButton(_ tab: AppTab, title: String, icon: String) -> some View {
+    private func tabButton(_ tab: AppTab) -> some View {
         Button {
             selection = tab
         } label: {
             VStack(spacing: 4) {
-                Image(systemName: selection == tab ? "\(icon).fill" : icon)
+                Image(systemName: selection == tab ? tab.selectedIcon : tab.icon)
                     .font(.title3)
-                Text(title)
+                Text(tab.title)
                     .font(.caption2.weight(.medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .foregroundStyle(selection == tab ? Color.accentColor : .secondary)
             .frame(maxWidth: .infinity)

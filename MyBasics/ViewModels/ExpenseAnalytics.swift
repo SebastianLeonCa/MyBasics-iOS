@@ -8,9 +8,9 @@ nonisolated enum KindFilter: String, CaseIterable, Identifiable, Sendable {
 
     var displayName: String {
         switch self {
-        case .all: "Todos"
-        case .fixed: "Fijos"
-        case .variable: "Variables"
+        case .all: String(localized: "Todos")
+        case .fixed: String(localized: "Fijos")
+        case .variable: String(localized: "Variables")
         }
     }
 
@@ -65,7 +65,7 @@ nonisolated enum ExpenseAnalytics {
             let category = items.first?.category
             return CategoryTotal(
                 categoryId: categoryId,
-                name: category?.name ?? "Sin categoría",
+                name: category?.displayName ?? String(localized: "Sin categoría"),
                 colorHex: category?.colorHex ?? "#8E8E93",
                 icon: category?.icon ?? "tag",
                 amountCents: amount,
@@ -86,18 +86,26 @@ nonisolated enum ExpenseAnalytics {
             .sorted { $0.day > $1.day }
     }
 
-    /// "Hoy", "Ayer", "12 oct" (o "12 oct 2025" si es de otro año).
-    static func dayTitle(for day: Date, now: Date = .now, calendar: Calendar = .app) -> String {
-        if calendar.isDate(day, inSameDayAs: now) { return "Hoy" }
+    /// Qué tan reciente es un día (sin texto: así se puede testear sin depender del idioma).
+    static func dayLabel(for day: Date, now: Date = .now, calendar: Calendar = .app) -> DayLabel {
+        if calendar.isDate(day, inSameDayAs: now) { return .today }
         if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
-           calendar.isDate(day, inSameDayAs: yesterday) { return "Ayer" }
-
-        let sameYear = calendar.isDate(day, equalTo: now, toGranularity: .year)
-        let f = DateFormatter()
-        f.calendar = calendar
-        f.locale = calendar.locale
-        f.timeZone = calendar.timeZone
-        f.dateFormat = sameYear ? "d MMM" : "d MMM yyyy"
-        return f.string(from: day).replacingOccurrences(of: ".", with: "")
+           calendar.isDate(day, inSameDayAs: yesterday) { return .yesterday }
+        return calendar.isDate(day, equalTo: now, toGranularity: .year) ? .thisYear : .otherYear
     }
+
+    /// "Hoy", "Ayer", "12 oct" (o "12 oct 2025" si es de otro año), en el idioma del dispositivo.
+    static func dayTitle(for day: Date, now: Date = .now, calendar: Calendar = .app) -> String {
+        let style = Date.FormatStyle(calendar: calendar, timeZone: calendar.timeZone).locale(calendar.locale ?? .current)
+        switch dayLabel(for: day, now: now, calendar: calendar) {
+        case .today: return String(localized: "Hoy")
+        case .yesterday: return String(localized: "Ayer")
+        case .thisYear: return day.formatted(style.day().month(.abbreviated))
+        case .otherYear: return day.formatted(style.day().month(.abbreviated).year())
+        }
+    }
+}
+
+nonisolated enum DayLabel: Equatable, Sendable {
+    case today, yesterday, thisYear, otherYear
 }

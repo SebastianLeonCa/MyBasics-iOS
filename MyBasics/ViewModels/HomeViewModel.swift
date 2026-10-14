@@ -95,7 +95,7 @@ final class HomeViewModel {
             try await repository.delete(id: expense.id)
         } catch {
             withAnimation(.smooth) { expenses = snapshot }
-            errorMessage = "No se pudo eliminar el gasto. \(error.localizedDescription)"
+            errorMessage = String(localized: "No se pudo eliminar el gasto. \(error.localizedDescription)")
         }
     }
 }

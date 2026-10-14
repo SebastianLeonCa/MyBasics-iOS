@@ -21,6 +21,10 @@ struct RootView: View {
                     onEdit: { editor = ExpenseEditorRoute(expense: $0) },
                     onAdd: { editor = ExpenseEditorRoute(expense: nil) }
                 )
+            case .shared:
+                SharedView(repository: env.expenseRepository)
+            case .subscriptions:
+                SubscriptionsView(repository: env.expenseRepository)
             case .settings:
                 SettingsView()
             }
@@ -40,8 +44,9 @@ struct RootView: View {
                 ),
                 onSaved: { saved in
                     homeViewModel.didSave(saved)
-                    // Al crear un gasto desde Ajustes, volvemos a Inicio para verlo.
-                    tab = .home
+                    // Inicio refleja el cambio al instante. Las otras pestañas recargan al abrirse;
+                    // si estás en una, volvemos a Inicio para ver el gasto nuevo.
+                    if tab != .home && route.expense == nil { tab = .home }
                 }
             )
         }

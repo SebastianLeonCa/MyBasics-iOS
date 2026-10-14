@@ -7,23 +7,27 @@ final class AddExpenseViewModel {
     let editingExpense: Expense?
     let currency: String
 
-    var amountText = "" {
-        didSet { syncDebtAmountIfNeeded() }
-    }
+    /// Texto del campo de monto. Se escribe con `setAmountText(_:)`, que lo limpia.
+    private(set) var amountText = ""
     private(set) var categories: [Category] = []
-    var categoryId: UUID?
+    var categoryId: UUID? {
+        didSet {
+            // Una suscripción es un gasto fijo por naturaleza.
+            if categoryId != oldValue, selectedCategory?.isSubscriptions == true { kind = .fixed }
+        }
+    }
     var kind: ExpenseKind = .variable
     var note = ""
     var spentAt = Date.now
 
-    // Deuda (sección plegable: abierta = el gasto incluye una deuda)
+    // Gasto compartido (sección plegable: abierta = alguien me debe o yo le debo una parte)
     var hasDebt = false {
         didSet { if hasDebt { syncDebtAmountIfNeeded() } }
     }
     var debtPerson = ""
     private(set) var debtAmountText = ""
     var debtDirection: DebtDirection = .theyOweMe
-    /// Si el usuario tocó el monto de la deuda, deja de seguir "la mitad del gasto".
+    /// Si el usuario tocó el monto compartido, deja de seguir "la mitad del gasto".
     private var debtAmountEdited = false
 
     private(set) var isSaving = false
@@ -59,8 +63,9 @@ final class AddExpenseViewModel {
     // MARK: - Derivados
 
     var isEditing: Bool { editingExpense != nil }
-    var title: String { isEditing ? "Editar gasto" : "Nuevo gasto" }
-    var usesDecimals: Bool { CurrencyFormatter.fractionDigits(for: currency) > 0 }
+    var title: String { isEditing ? String(localized: "Editar gasto") : String(localized: "Nuevo gasto") }
+    var usesDecimals: Bool { CurrencyFormatter.inputDecimals(for: currency) > 0 }
+    var selectedCategory: Category? { categories.first { $0.id == categoryId } }
 
     var amountCents: Int? { CurrencyFormatter.cents(fromInput: amountText, currency: currency) }
     var debtAmountCents: Int? { CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency) }
@@ -77,8 +82,13 @@ final class AddExpenseViewModel {
 
     // MARK: - Acciones
 
+    func setAmountText(_ text: String) {
+        amountText = CurrencyFormatter.sanitizeInput(text, currency: currency)
+        syncDebtAmountIfNeeded()
+    }
+
     func setDebtAmountText(_ text: String) {
-        debtAmountText = text
+        debtAmountText = CurrencyFormatter.sanitizeInput(text, currency: currency)
         debtAmountEdited = true
     }
 
@@ -106,7 +116,7 @@ final class AddExpenseViewModel {
                 ? try await expenseRepository.update(expense)
                 : try await expenseRepository.create(expense)
         } catch {
-            errorMessage = "No se pudo guardar. \(error.localizedDescription)"
+            errorMessage = String(localized: "No se pudo guardar. \(error.localizedDescription)")
             return nil
         }
     }
@@ -143,7 +153,7 @@ final class AddExpenseViewModel {
         guard !debtAmountEdited else { return }
         debtAmountText = amountCents.map {
             CurrencyFormatter.inputString(
-                fromCents: CurrencyFormatter.roundedToDisplayable($0 / 2, currency: currency),
+                fromCents: CurrencyFormatter.roundedToInputable($0 / 2, currency: currency),
                 currency: currency)
         } ?? ""
     }
