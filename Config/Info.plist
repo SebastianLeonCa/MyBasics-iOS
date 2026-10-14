@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Se combina con el Info.plist generado por Xcode. Los valores vienen de Config/Secrets.xcconfig. -->
+<plist version="1.0">
+<dict>
+	<key>SupabaseURL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SupabaseAnonKey</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+	<key>DevUserEmail</key>
+	<string>$(DEV_USER_EMAIL)</string>
+	<key>DevUserPassword</key>
+	<string>$(DEV_USER_PASSWORD)</string>
+</dict>
+</plist>

@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		049259C2308003C000542364 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 049259C1308003C000542364 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		049259B7308003C000542364 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,6 +25,7 @@
 		049259A0308003C000542364 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		049259A1308003C000542364 /* Secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.example.xcconfig; sourceTree = "<group>"; };
 		049259B1308003C000542364 /* MyBasicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyBasicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		049259C3308003C000542364 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,6 +45,7 @@
 		0492597E308003BF00542364 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				049259C2308003C000542364 /* Supabase in Frameworks */,
 			);
 		};
 		049259B4308003C000542364 /* Frameworks */ = {
@@ -74,6 +80,7 @@
 			children = (
 				049259A0308003C000542364 /* Base.xcconfig */,
 				049259A1308003C000542364 /* Secrets.example.xcconfig */,
+				049259C3308003C000542364 /* Info.plist */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -95,6 +102,9 @@
 				04925983308003BF00542364 /* MyBasics */,
 			);
 			name = MyBasics;
+			packageProductDependencies = (
+				049259C1308003C000542364 /* Supabase */,
+			);
 			productName = MyBasics;
 			productReference = 04925981308003BF00542364 /* MyBasics.app */;
 			productType = "com.apple.product-type.application";
@@ -149,6 +159,9 @@
 			);
 			mainGroup = 04925978308003BF00542364;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04925982308003BF00542364 /* Products */;
 			projectDirPath = "";
@@ -327,6 +340,7 @@
 				DEVELOPMENT_TEAM = R56B22BBKJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -360,6 +374,7 @@
 				DEVELOPMENT_TEAM = R56B22BBKJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -452,6 +467,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 2.55.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		049259C1308003C000542364 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 04925979308003BF00542364 /* Project object */;
 	validationLevel = 1;
