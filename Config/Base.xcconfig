@@ -1,0 +1,3 @@
+// Configuración base del target MyBasics.
+// Incluye los secretos locales si existen (el "?" evita fallar si falta el archivo).
+#include? "Secrets.xcconfig"
