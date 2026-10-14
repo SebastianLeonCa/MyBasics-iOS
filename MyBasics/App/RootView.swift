@@ -12,6 +12,26 @@ struct RootView: View {
     }
 
     var body: some View {
+        switch env.sessionState {
+        case .ready:
+            content
+        case .signingIn:
+            ProgressView("Conectando…")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .task { await env.start() }
+        case .failed(let message):
+            ContentUnavailableView {
+                Label("No se pudo conectar", systemImage: "icloud.slash")
+            } description: {
+                Text(message)
+            } actions: {
+                Button("Reintentar") { Task { await env.start() } }
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    private var content: some View {
         Group {
             switch tab {
             case .home:
@@ -38,14 +58,13 @@ struct RootView: View {
             AddExpenseView(
                 viewModel: AddExpenseViewModel(
                     editing: route.expense,
-                    expenseRepository: env.expenseRepository,
                     categoryRepository: env.categoryRepository,
                     currency: env.currency
                 ),
-                onSaved: { saved in
-                    homeViewModel.didSave(saved)
-                    // Inicio refleja el cambio al instante. Las otras pestañas recargan al abrirse;
-                    // si estás en una, volvemos a Inicio para ver el gasto nuevo.
+                onSubmit: { expense in
+                    // Guardado optimista: Inicio lo muestra ya y revierte si el servidor falla.
+                    Task { await homeViewModel.save(expense, isNew: route.expense == nil) }
+                    // Las otras pestañas recargan al abrirse; si estás en una, volvemos a Inicio.
                     if tab != .home && route.expense == nil { tab = .home }
                 }
             )

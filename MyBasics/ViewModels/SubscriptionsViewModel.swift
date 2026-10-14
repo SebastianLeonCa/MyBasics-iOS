@@ -8,7 +8,7 @@ final class SubscriptionsViewModel {
     private(set) var summaries: [SubscriptionSummary] = []
     private(set) var isLoading = false
     private(set) var hasLoaded = false
-    var errorMessage: String?
+    private(set) var loadError: String?
 
     init(repository: any ExpenseRepository, now: @escaping () -> Date = { .now }) {
         self.repository = repository
@@ -29,8 +29,11 @@ final class SubscriptionsViewModel {
             let expenses = try await repository.fetchExpenses(in: SubscriptionAnalytics.lookbackInterval(now: now))
             summaries = SubscriptionAnalytics.summaries(from: expenses, now: now)
             hasLoaded = true
+            loadError = nil
+        } catch is CancellationError {
+            return
         } catch {
-            errorMessage = error.localizedDescription
+            loadError = UserFacingError.describe(error)
         }
     }
 }

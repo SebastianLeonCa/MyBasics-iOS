@@ -8,7 +8,8 @@ final class SharedViewModel {
     private(set) var shares: [PendingShare] = []
     private(set) var isLoading = false
     private(set) var hasLoaded = false
-    var errorMessage: String?
+    private(set) var loadError: String?
+    var alert: UserFacingError?
 
     init(repository: any ExpenseRepository) {
         self.repository = repository
@@ -24,20 +25,29 @@ final class SharedViewModel {
         do {
             shares = SharedBalances.pendingShares(from: try await repository.fetchExpensesWithPendingDebts())
             hasLoaded = true
+            loadError = nil
+        } catch is CancellationError {
+            return
         } catch {
-            errorMessage = error.localizedDescription
+            if hasLoaded {
+                alert = UserFacingError(error, retry: { [weak self] in await self?.load() })
+            } else {
+                loadError = UserFacingError.describe(error)
+            }
         }
     }
 
-    /// Marca como pagado; se quita de la lista al instante y se revierte si falla.
+    /// Marca como pagado; se quita de la lista al instante y vuelve si el servidor falla.
     func markPaid(_ share: PendingShare) async {
-        let snapshot = shares
         withAnimation(.smooth) { shares.removeAll { $0.id == share.id } }
         do {
             try await repository.settleDebt(id: share.debt.id)
         } catch {
-            withAnimation(.smooth) { shares = snapshot }
-            errorMessage = String(localized: "No se pudo marcar como pagado. \(error.localizedDescription)")
+            withAnimation(.smooth) { shares.append(share) }   // el orden lo recalcula `balances`
+            alert = UserFacingError(
+                error,
+                title: String(localized: "No se pudo marcar como pagado"),
+                retry: { [weak self] in await self?.markPaid(share) })
         }
     }
 }

@@ -2,7 +2,6 @@ import Foundation
 
 @Observable
 final class AddExpenseViewModel {
-    private let expenseRepository: any ExpenseRepository
     private let categoryRepository: any CategoryRepository
     let editingExpense: Expense?
     let currency: String
@@ -30,17 +29,17 @@ final class AddExpenseViewModel {
     /// Si el usuario tocó el monto compartido, deja de seguir "la mitad del gasto".
     private var debtAmountEdited = false
 
-    private(set) var isSaving = false
-    var errorMessage: String?
+    private(set) var isLoadingCategories = false
+    /// Error al cargar las categorías (se muestra en la fila de chips con "Reintentar").
+    private(set) var categoriesError: String?
+    var alert: UserFacingError?
 
     init(
         editing expense: Expense? = nil,
-        expenseRepository: any ExpenseRepository,
         categoryRepository: any CategoryRepository,
         currency: String
     ) {
         self.editingExpense = expense
-        self.expenseRepository = expenseRepository
         self.categoryRepository = categoryRepository
         self.currency = expense?.currency ?? currency
 
@@ -77,7 +76,7 @@ final class AddExpenseViewModel {
     }
 
     var canSave: Bool {
-        (amountCents ?? 0) > 0 && categoryId != nil && isDebtValid && !isSaving
+        (amountCents ?? 0) > 0 && categoryId != nil && isDebtValid
     }
 
     // MARK: - Acciones
@@ -93,10 +92,15 @@ final class AddExpenseViewModel {
     }
 
     func loadCategories() async {
+        isLoadingCategories = true
+        defer { isLoadingCategories = false }
         do {
             categories = try await categoryRepository.fetchCategories()
+            categoriesError = nil
+        } catch is CancellationError {
+            return
         } catch {
-            errorMessage = error.localizedDescription
+            categoriesError = UserFacingError.describe(error)
         }
     }
 
@@ -104,21 +108,6 @@ final class AddExpenseViewModel {
         let saved = try await categoryRepository.create(category)
         categories.append(saved)
         categoryId = saved.id
-    }
-
-    /// Guarda (crea o actualiza). Devuelve el gasto guardado, o nil si falló.
-    func save() async -> Expense? {
-        guard canSave, let expense = makeExpense() else { return nil }
-        isSaving = true
-        defer { isSaving = false }
-        do {
-            return isEditing
-                ? try await expenseRepository.update(expense)
-                : try await expenseRepository.create(expense)
-        } catch {
-            errorMessage = String(localized: "No se pudo guardar. \(error.localizedDescription)")
-            return nil
-        }
     }
 
     func makeExpense() -> Expense? {

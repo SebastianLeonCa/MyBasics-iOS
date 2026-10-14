@@ -5,7 +5,8 @@ final class CategoriesViewModel {
     private let repository: any CategoryRepository
 
     private(set) var categories: [Category] = []
-    var errorMessage: String?
+    private(set) var hasLoaded = false
+    private(set) var loadError: String?
 
     init(repository: any CategoryRepository) {
         self.repository = repository
@@ -14,8 +15,12 @@ final class CategoriesViewModel {
     func load() async {
         do {
             categories = try await repository.fetchCategories()
+            hasLoaded = true
+            loadError = nil
+        } catch is CancellationError {
+            return
         } catch {
-            errorMessage = error.localizedDescription
+            loadError = UserFacingError.describe(error)
         }
     }
 
