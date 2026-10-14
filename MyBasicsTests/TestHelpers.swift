@@ -13,9 +13,9 @@ nonisolated enum Fixtures {
     }
 
     static func expense(
-        _ category: MyBasics.Category, pesos: Int, kind: ExpenseKind = .variable, at date: Date, note: String? = nil
+        _ category: MyBasics.Category, units: Int, kind: ExpenseKind = .variable, at date: Date, note: String? = nil
     ) -> Expense {
-        Expense(categoryId: category.id, amountCents: pesos * 100, kind: kind, note: note,
+        Expense(categoryId: category.id, amountCents: units * 100, kind: kind, note: note,
                 spentAt: date, category: category)
     }
 }

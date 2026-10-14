@@ -5,10 +5,10 @@ final class ExpenseAnalyticsTests: XCTestCase {
     private typealias F = Fixtures
 
     private lazy var sample: [Expense] = [
-        F.expense(F.home, pesos: 450_000, kind: .fixed, at: F.date(2026, 10, 1, 9)),
-        F.expense(F.food, pesos: 8_000, at: F.date(2026, 10, 12, 13)),
-        F.expense(F.food, pesos: 2_000, at: F.date(2026, 10, 12, 18)),
-        F.expense(F.transport, pesos: 10_000, at: F.date(2026, 10, 14, 8)),
+        F.expense(F.home, units: 450_000, kind: .fixed, at: F.date(2026, 10, 1, 9)),
+        F.expense(F.food, units: 8_000, at: F.date(2026, 10, 12, 13)),
+        F.expense(F.food, units: 2_000, at: F.date(2026, 10, 12, 18)),
+        F.expense(F.transport, units: 10_000, at: F.date(2026, 10, 14, 8)),
     ]
 
     // MARK: Filtro y total
@@ -29,7 +29,7 @@ final class ExpenseAnalyticsTests: XCTestCase {
     func testCategoryTotalsAreGroupedAndSortedDescending() {
         let totals = ExpenseAnalytics.categoryTotals(ExpenseAnalytics.filter(sample, by: .variable))
 
-        XCTAssertEqual(totals.map(\.name), ["Comida", "Transporte"])   // 10.000 vs 10.000 → empate por nombre
+        XCTAssertEqual(totals.map(\.categoryId), [F.food.id, F.transport.id])   // empate de monto → por nombre
         XCTAssertEqual(totals.map(\.amountCents), [1_000_000, 1_000_000])
         XCTAssertEqual(totals[0].share, 0.5, accuracy: 0.0001)
     }
@@ -37,7 +37,7 @@ final class ExpenseAnalyticsTests: XCTestCase {
     func testCategoryTotalsSharesAddUpToOne() {
         let totals = ExpenseAnalytics.categoryTotals(sample)
 
-        XCTAssertEqual(totals.first?.name, "Hogar")
+        XCTAssertEqual(totals.first?.categoryId, F.home.id)
         XCTAssertEqual(totals.map(\.amountCents).reduce(0, +), ExpenseAnalytics.total(sample))
         XCTAssertEqual(totals.map(\.share).reduce(0, +), 1, accuracy: 0.0001)
     }
@@ -60,11 +60,21 @@ final class ExpenseAnalyticsTests: XCTestCase {
         XCTAssertEqual(sections[1].totalCents, 1_000_000)
     }
 
-    func testDayTitle() {
+    func testDayLabel() {
         let now = F.date(2026, 10, 14, 15)
-        XCTAssertEqual(ExpenseAnalytics.dayTitle(for: F.date(2026, 10, 14, 0), now: now, calendar: F.calendar), "Hoy")
-        XCTAssertEqual(ExpenseAnalytics.dayTitle(for: F.date(2026, 10, 13, 0), now: now, calendar: F.calendar), "Ayer")
-        XCTAssertEqual(ExpenseAnalytics.dayTitle(for: F.date(2026, 10, 12, 0), now: now, calendar: F.calendar), "12 oct")
-        XCTAssertEqual(ExpenseAnalytics.dayTitle(for: F.date(2025, 12, 3, 0), now: now, calendar: F.calendar), "3 dic 2025")
+        XCTAssertEqual(ExpenseAnalytics.dayLabel(for: F.date(2026, 10, 14, 0), now: now, calendar: F.calendar), .today)
+        XCTAssertEqual(ExpenseAnalytics.dayLabel(for: F.date(2026, 10, 13, 23), now: now, calendar: F.calendar), .yesterday)
+        XCTAssertEqual(ExpenseAnalytics.dayLabel(for: F.date(2026, 10, 12, 0), now: now, calendar: F.calendar), .thisYear)
+        XCTAssertEqual(ExpenseAnalytics.dayLabel(for: F.date(2025, 12, 3, 0), now: now, calendar: F.calendar), .otherYear)
+    }
+
+    func testDayTitleUsesCalendarLocale() {
+        let now = F.date(2026, 10, 14, 15)
+        var spanish = F.calendar
+        spanish.locale = Locale(identifier: "es_ES")
+        var english = F.calendar
+        english.locale = Locale(identifier: "en_US")
+        XCTAssertTrue(ExpenseAnalytics.dayTitle(for: F.date(2026, 10, 12), now: now, calendar: spanish).hasPrefix("12 oct"))
+        XCTAssertEqual(ExpenseAnalytics.dayTitle(for: F.date(2026, 10, 12), now: now, calendar: english), "Oct 12")
     }
 }

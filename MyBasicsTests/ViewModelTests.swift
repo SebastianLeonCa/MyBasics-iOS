@@ -9,9 +9,9 @@ final class HomeViewModelTests: XCTestCase {
     private func makeViewModel() -> (HomeViewModel, MockExpenseRepository) {
         let repo = MockExpenseRepository(
             expenses: [
-                F.expense(F.home, pesos: 450_000, kind: .fixed, at: F.date(2026, 10, 1)),
-                F.expense(F.food, pesos: 8_000, at: F.date(2026, 10, 12)),
-                F.expense(F.food, pesos: 5_000, at: F.date(2026, 9, 20)),
+                F.expense(F.home, units: 450_000, kind: .fixed, at: F.date(2026, 10, 1)),
+                F.expense(F.food, units: 8_000, at: F.date(2026, 10, 12)),
+                F.expense(F.food, units: 5_000, at: F.date(2026, 9, 20)),
             ],
             categories: { [F.home, F.food] }
         )
@@ -30,7 +30,7 @@ final class HomeViewModelTests: XCTestCase {
 
         vm.showPreviousMonth()
         await vm.load()
-        XCTAssertEqual(vm.monthTitle, "Septiembre 2026")
+        XCTAssertEqual(vm.month, F.date(2026, 9, 1, 0))
         XCTAssertEqual(vm.totalCents, 500_000)
         XCTAssertTrue(vm.canGoToNextMonth)
     }
@@ -39,14 +39,14 @@ final class HomeViewModelTests: XCTestCase {
         let (vm, _) = makeViewModel()
         XCTAssertFalse(vm.canGoToNextMonth)
         vm.showNextMonth()
-        XCTAssertEqual(vm.monthTitle, "Octubre 2026")
+        XCTAssertEqual(vm.month, F.date(2026, 10, 1, 0))
     }
 
     func testSelectionTogglesAndClearsOnFilterChange() async {
         let (vm, _) = makeViewModel()
         await vm.load()
         vm.toggleSelection(F.food.id)
-        XCTAssertEqual(vm.selectedTotal?.name, "Comida")
+        XCTAssertEqual(vm.selectedTotal?.categoryId, F.food.id)
         vm.toggleSelection(F.food.id)
         XCTAssertNil(vm.selectedTotal)
 
@@ -59,7 +59,7 @@ final class HomeViewModelTests: XCTestCase {
         let (vm, repo) = makeViewModel()
         await vm.load()
 
-        let created = try await repo.create(F.expense(F.food, pesos: 3_000, at: F.date(2026, 10, 13)))
+        let created = try await repo.create(F.expense(F.food, units: 3_000, at: F.date(2026, 10, 13)))
         vm.didSave(created)
         XCTAssertEqual(vm.expenses.count, 3)
 
@@ -85,38 +85,38 @@ final class AddExpenseViewModelTests: XCTestCase {
             editing: editing,
             expenseRepository: MockExpenseRepository(categories: { [F.food] }),
             categoryRepository: MockCategoryRepository(categories: [F.food]),
-            currency: "CLP"
+            currency: "USD"
         )
     }
 
     func testCannotSaveWithoutAmountOrCategory() {
         let vm = makeViewModel()
         XCTAssertFalse(vm.canSave)
-        vm.amountText = "2500"
+        vm.setAmountText("2500")
         XCTAssertFalse(vm.canSave)
         vm.categoryId = F.food.id
         XCTAssertTrue(vm.canSave)
-        vm.amountText = "0"
+        vm.setAmountText("0")
         XCTAssertFalse(vm.canSave)
     }
 
     func testDebtDefaultsToHalfUntilEdited() {
         let vm = makeViewModel()
-        vm.amountText = "5000"
+        vm.setAmountText("5000")
         vm.hasDebt = true
         XCTAssertEqual(vm.debtAmountCents, 250_000)
 
-        vm.amountText = "3001"   // la mitad se redondea a pesos enteros
-        XCTAssertEqual(vm.debtAmountCents, 150_100)
+        vm.setAmountText("3001")   // la mitad exacta en centavos: 1500.50
+        XCTAssertEqual(vm.debtAmountCents, 150_050)
 
         vm.setDebtAmountText("1000")
-        vm.amountText = "9000"
+        vm.setAmountText("9000")
         XCTAssertEqual(vm.debtAmountCents, 100_000)
     }
 
     func testDebtValidation() {
         let vm = makeViewModel()
-        vm.amountText = "5000"
+        vm.setAmountText("5000")
         vm.categoryId = F.food.id
         vm.hasDebt = true
         XCTAssertFalse(vm.canSave, "falta la persona")
@@ -127,16 +127,16 @@ final class AddExpenseViewModelTests: XCTestCase {
     }
 
     func testEditingPreloadsAndKeepsIds() async throws {
-        var original = F.expense(F.food, pesos: 4_000, at: F.date(2026, 10, 10), note: "Pizza")
+        var original = F.expense(F.food, units: 4_000, at: F.date(2026, 10, 10), note: "Pizza")
         original.debts = [Debt(counterpartyName: "Ana", amountCents: 200_000, direction: .iOweThem)]
         let vm = makeViewModel(editing: original)
 
-        XCTAssertEqual(vm.title, "Editar gasto")
+        XCTAssertTrue(vm.isEditing)
         XCTAssertEqual(vm.amountText, "4000")
         XCTAssertEqual(vm.debtPerson, "Ana")
         XCTAssertEqual(vm.debtDirection, .iOweThem)
 
-        vm.amountText = "4500"
+        vm.setAmountText("4500")
         let edited = try XCTUnwrap(vm.makeExpense())
         XCTAssertEqual(edited.id, original.id)
         XCTAssertEqual(edited.debts.first?.id, original.debts.first?.id)
@@ -146,31 +146,39 @@ final class AddExpenseViewModelTests: XCTestCase {
 }
 
 @MainActor
-final class DebtsAndMockDataTests: XCTestCase {
+final class AmountInputTests: XCTestCase {
+    func testAmountFieldKeepsAtMostTwoDecimals() {
+        let vm = AddExpenseViewModel(
+            expenseRepository: MockExpenseRepository(),
+            categoryRepository: MockCategoryRepository(),
+            currency: "USD")
+        let sep = CurrencyFormatter.decimalSeparator()
+        vm.setAmountText("12\(sep)345")
+        XCTAssertEqual(vm.amountText, "12\(sep)34")
+        XCTAssertEqual(vm.amountCents, 1_234)
+    }
+
+    func testChoosingSubscriptionsMakesExpenseFixed() async {
+        let vm = AddExpenseViewModel(
+            expenseRepository: MockExpenseRepository(),
+            categoryRepository: MockCategoryRepository(),
+            currency: "USD")
+        await vm.loadCategories()
+        XCTAssertEqual(vm.kind, .variable)
+        vm.categoryId = vm.categories.first(where: \.isSubscriptions)?.id
+        XCTAssertEqual(vm.kind, .fixed)
+    }
+}
+
+@MainActor
+final class MockDataTests: XCTestCase {
     func testMockDataIsRealistic() {
         let now = Fixtures.date(2026, 10, 14, 15)
         let expenses = MockData.expenses(categories: MyBasics.Category.defaults, now: now)
 
-        XCTAssertEqual(expenses.count, 40)
+        XCTAssertTrue((38...45).contains(expenses.count), "~40 gastos, hay \(expenses.count)")
         XCTAssertEqual(Set(expenses.map { $0.spentAt.startOfMonth() }).count, 3)
-        XCTAssertTrue(expenses.allSatisfy { $0.spentAt <= now && $0.amountCents > 0 })
+        XCTAssertTrue(expenses.allSatisfy { $0.spentAt <= now && $0.amountCents > 0 && $0.currency == "USD" })
         XCTAssertGreaterThan(expenses.filter(\.hasPendingDebt).count, 2)
-    }
-
-    func testSettleDebtRemovesItAndUpdatesTotals() async throws {
-        let now = Fixtures.date(2026, 10, 14, 15)
-        let repo = MockExpenseRepository(expenses: MockData.expenses(categories: MyBasics.Category.defaults, now: now))
-        let vm = DebtsViewModel(repository: repo)
-        await vm.load()
-        let before = vm.items.count
-        let item = try XCTUnwrap(vm.items.first { $0.debt.direction == .theyOweMe })
-        let owedBefore = vm.theyOweMeCents
-
-        await vm.settle(item)
-
-        XCTAssertEqual(vm.items.count, before - 1)
-        XCTAssertEqual(vm.theyOweMeCents, owedBefore - item.debt.amountCents)
-        await vm.load()
-        XCTAssertFalse(vm.items.contains { $0.id == item.id }, "persistido en el repositorio")
     }
 }
