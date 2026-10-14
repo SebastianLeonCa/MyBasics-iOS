@@ -27,10 +27,29 @@ enum CurrencyFormatter {
         formatter(for: currency).maximumFractionDigits
     }
 
+    /// Símbolo de la moneda en es_CL ("$" para CLP, "US$" para USD).
+    static func symbol(for currency: String) -> String {
+        formatter(for: currency).currencySymbol ?? currency
+    }
+
     /// 250000 centavos CLP → "$2.500"
     static func string(fromCents cents: Int, currency: String = defaultCurrency) -> String {
         let value = Decimal(cents) / Decimal(centsPerUnit)
         return formatter(for: currency).string(from: value as NSDecimalNumber) ?? "\(value)"
+    }
+
+    /// Centavos → texto editable para un campo de monto: 125000 (CLP) → "1250", 1250 (USD) → "12,50".
+    static func inputString(fromCents cents: Int, currency: String = defaultCurrency) -> String {
+        let units = cents / centsPerUnit
+        let remainder = abs(cents % centsPerUnit)
+        guard fractionDigits(for: currency) > 0 else { return "\(units)" }
+        return remainder == 0 ? "\(units)" : String(format: "%d,%02d", units, remainder)
+    }
+
+    /// Redondea a la unidad mínima que se muestra (CLP: pesos enteros). 125050 (CLP) → 125100.
+    static func roundedToDisplayable(_ cents: Int, currency: String = defaultCurrency) -> Int {
+        guard fractionDigits(for: currency) == 0 else { return cents }
+        return ((cents + centsPerUnit / 2) / centsPerUnit) * centsPerUnit
     }
 
     /// Lo que escribe el usuario → centavos. "2.500" (CLP) → 250000, "12,5" (USD) → 1250.

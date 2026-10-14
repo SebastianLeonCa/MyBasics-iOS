@@ -4,8 +4,12 @@ import Foundation
 protocol ExpenseRepository: AnyObject {
     /// Gastos con `spentAt` dentro del intervalo [start, end), con categoría y deudas embebidas.
     func fetchExpenses(in interval: DateInterval) async throws -> [Expense]
+    /// Gastos (de cualquier mes) que tienen al menos una deuda sin saldar.
+    func fetchExpensesWithPendingDebts() async throws -> [Expense]
     /// Crea el gasto junto con sus deudas (una operación lógica).
     func create(_ expense: Expense) async throws -> Expense
     func update(_ expense: Expense) async throws -> Expense
     func delete(id: UUID) async throws
+    /// Marca una deuda como saldada (ahora).
+    func settleDebt(id: UUID) async throws
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Repositorio en memoria. Se pierde al cerrar la app (los datos de ejemplo llegan en la Fase 1).
+/// Repositorio en memoria. Se pierde al cerrar la app.
 final class MockExpenseRepository: ExpenseRepository {
     private var expenses: [Expense]
     private let categories: () -> [Category]
@@ -13,6 +13,13 @@ final class MockExpenseRepository: ExpenseRepository {
     func fetchExpenses(in interval: DateInterval) async throws -> [Expense] {
         expenses
             .filter { $0.spentAt >= interval.start && $0.spentAt < interval.end }
+            .map(withCategory)
+            .sorted { $0.spentAt > $1.spentAt }
+    }
+
+    func fetchExpensesWithPendingDebts() async throws -> [Expense] {
+        expenses
+            .filter(\.hasPendingDebt)
             .map(withCategory)
             .sorted { $0.spentAt > $1.spentAt }
     }
@@ -34,6 +41,17 @@ final class MockExpenseRepository: ExpenseRepository {
 
     func delete(id: UUID) async throws {
         expenses.removeAll { $0.id == id }
+    }
+
+    func settleDebt(id: UUID) async throws {
+        for e in expenses.indices {
+            if let d = expenses[e].debts.firstIndex(where: { $0.id == id }) {
+                expenses[e].debts[d].isSettled = true
+                expenses[e].debts[d].settledAt = .now
+                return
+            }
+        }
+        throw RepositoryError.notFound
     }
 
     /// Simula el join `category:categories(...)` de Supabase.

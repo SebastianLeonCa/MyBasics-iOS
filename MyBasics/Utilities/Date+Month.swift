@@ -1,6 +1,6 @@
 import Foundation
 
-extension Calendar {
+nonisolated extension Calendar {
     /// Calendario usado en toda la app (semana desde lunes, español de Chile).
     static var app: Calendar {
         var cal = Calendar(identifier: .gregorian)
@@ -10,7 +10,7 @@ extension Calendar {
     }
 }
 
-extension Date {
+nonisolated extension Date {
     /// Primer instante del mes de esta fecha.
     func startOfMonth(calendar: Calendar = .app) -> Date {
         let comps = calendar.dateComponents([.year, .month], from: self)
