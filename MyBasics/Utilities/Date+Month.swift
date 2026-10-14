@@ -1,10 +1,10 @@
 import Foundation
 
 nonisolated extension Calendar {
-    /// Calendario usado en toda la app (semana desde lunes, español de Chile).
+    /// Calendario gregoriano con el idioma/región del dispositivo.
     static var app: Calendar {
         var cal = Calendar(identifier: .gregorian)
-        cal.locale = Locale(identifier: "es_CL")
+        cal.locale = .current
         cal.timeZone = .current
         return cal
     }
@@ -30,14 +30,15 @@ nonisolated extension Date {
         return calendar.date(byAdding: .month, value: months, to: start) ?? start
     }
 
-    /// "Octubre 2026"
+    /// "Octubre 2026" / "October 2026"
     func monthTitle(calendar: Calendar = .app) -> String {
         let f = DateFormatter()
         f.calendar = calendar
         f.locale = calendar.locale
         f.timeZone = calendar.timeZone
         f.dateFormat = "LLLL yyyy"
-        return f.string(from: self).capitalized(with: calendar.locale)
+        let title = f.string(from: self)
+        return title.prefix(1).uppercased(with: calendar.locale) + title.dropFirst()
     }
 
     func isSameMonth(as other: Date, calendar: Calendar = .app) -> Bool {
