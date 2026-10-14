@@ -36,13 +36,25 @@ nonisolated struct Category: Identifiable, Codable, Hashable, Sendable {
     }
 }
 
-extension Category {
+nonisolated extension Category {
+    /// Nombre (en español) con el que se guarda la categoría de suscripciones por defecto.
+    static let subscriptionsName = "Suscripciones"
+
+    /// Nombre para mostrar: las categorías por defecto se traducen; las creadas por el usuario no.
+    var displayName: String {
+        isDefault ? Bundle.main.localizedString(forKey: name, value: name, table: nil) : name
+    }
+
+    var isSubscriptions: Bool { isDefault && name == Self.subscriptionsName }
+
     /// Categorías por defecto (las mismas que sembrará Supabase en la Fase 2).
+    /// Se guardan en español; `displayName` las traduce.
     static let defaults: [Category] = [
         Category(name: "Comida", colorHex: "#FF6B35", icon: "fork.knife", isDefault: true),
         Category(name: "Supermercado", colorHex: "#2EC4B6", icon: "cart", isDefault: true),
         Category(name: "Transporte", colorHex: "#3A86FF", icon: "car", isDefault: true),
         Category(name: "Hogar", colorHex: "#8338EC", icon: "house", isDefault: true),
+        Category(name: subscriptionsName, colorHex: "#5E60CE", icon: "repeat", isDefault: true),
         Category(name: "Salud", colorHex: "#FF006E", icon: "cross.case", isDefault: true),
         Category(name: "Ocio", colorHex: "#FFBE0B", icon: "gamecontroller", isDefault: true),
         Category(name: "Otros", colorHex: "#8E8E93", icon: "ellipsis.circle", isDefault: true),

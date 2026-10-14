@@ -5,7 +5,7 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
     var categoryId: UUID
     /// Monto en centavos. Nunca Double.
     var amountCents: Int
-    /// Código ISO 4217, p. ej. "CLP".
+    /// Código ISO 4217, p. ej. "USD".
     var currency: String
     var kind: ExpenseKind
     var note: String?
@@ -18,7 +18,7 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         id: UUID = UUID(),
         categoryId: UUID,
         amountCents: Int,
-        currency: String = "CLP",
+        currency: String = "USD",
         kind: ExpenseKind = .variable,
         note: String? = nil,
         spentAt: Date = .now,
@@ -53,7 +53,7 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         id = try c.decode(UUID.self, forKey: .id)
         categoryId = try c.decode(UUID.self, forKey: .categoryId)
         amountCents = try c.decode(Int.self, forKey: .amountCents)
-        currency = try c.decodeIfPresent(String.self, forKey: .currency) ?? "CLP"
+        currency = try c.decodeIfPresent(String.self, forKey: .currency) ?? "USD"
         kind = try c.decode(ExpenseKind.self, forKey: .kind)
         note = try c.decodeIfPresent(String.self, forKey: .note)
         spentAt = try c.decode(Date.self, forKey: .spentAt)
@@ -62,11 +62,11 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
     }
 }
 
-extension Expense {
+nonisolated extension Expense {
     /// Texto a mostrar en la lista: la descripción o, si no hay, el nombre de la categoría.
     var displayTitle: String {
         if let note, !note.trimmingCharacters(in: .whitespaces).isEmpty { return note }
-        return category?.name ?? "Gasto"
+        return category?.displayName ?? String(localized: "Gasto")
     }
 
     var hasPendingDebt: Bool { debts.contains { !$0.isSettled } }

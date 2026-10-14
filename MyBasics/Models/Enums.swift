@@ -9,13 +9,13 @@ nonisolated enum ExpenseKind: String, Codable, CaseIterable, Identifiable, Hasha
 
     var displayName: String {
         switch self {
-        case .fixed: "Fijo"
-        case .variable: "Variable"
+        case .fixed: String(localized: "Fijo")
+        case .variable: String(localized: "Variable")
         }
     }
 }
 
-/// Dirección de una deuda asociada a un gasto.
+/// Dirección de un gasto compartido (en la base de datos se llama "debt").
 nonisolated enum DebtDirection: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case theyOweMe = "they_owe_me"
     case iOweThem = "i_owe_them"
@@ -24,8 +24,8 @@ nonisolated enum DebtDirection: String, Codable, CaseIterable, Identifiable, Has
 
     var displayName: String {
         switch self {
-        case .theyOweMe: "Me deben"
-        case .iOweThem: "Yo debo"
+        case .theyOweMe: String(localized: "Me debe")
+        case .iOweThem: String(localized: "Le debo")
         }
     }
 }

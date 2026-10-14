@@ -1,6 +1,7 @@
 import Foundation
 
-/// Datos de ejemplo: ~40 gastos realistas en los últimos 3 meses (relativos a `now`), algunos con deudas.
+/// Datos de ejemplo: ~40 gastos realistas en los últimos 3 meses (relativos a `now`),
+/// algunos compartidos y varias suscripciones (una ya cancelada).
 nonisolated enum MockData {
     private struct Seed {
         let monthOffset: Int   // 0 = mes actual, -1 = anterior, ...
@@ -8,61 +9,60 @@ nonisolated enum MockData {
         let hour: Int
         let note: String?
         let category: String
-        let pesos: Int         // en pesos; se convierte a centavos (×100)
+        let cents: Int
         var kind: ExpenseKind = .variable
-        var debt: (name: String, pesos: Int, direction: DebtDirection, settled: Bool)? = nil
+        var shared: (name: String, cents: Int, direction: DebtDirection, settled: Bool)? = nil
     }
 
     private static let seeds: [Seed] = {
+        let subs = Category.subscriptionsName
         var list: [Seed] = []
-        // Gastos fijos, todos los meses.
+        // Fijos y suscripciones, todos los meses.
         for m in [0, -1, -2] {
             list += [
-                Seed(monthOffset: m, day: 1, hour: 9, note: "Arriendo", category: "Hogar", pesos: 450_000, kind: .fixed),
-                Seed(monthOffset: m, day: 3, hour: 8, note: "Gimnasio", category: "Salud", pesos: 29_990, kind: .fixed),
-                Seed(monthOffset: m, day: 5, hour: 10, note: "Netflix", category: "Ocio", pesos: 9_990, kind: .fixed),
-                Seed(monthOffset: m, day: 10, hour: 11, note: "Plan celular", category: "Otros", pesos: 15_990, kind: .fixed),
+                Seed(monthOffset: m, day: 1, hour: 9, note: "Arriendo", category: "Hogar", cents: 120_000, kind: .fixed),
+                Seed(monthOffset: m, day: 3, hour: 8, note: "Gimnasio", category: "Salud", cents: 3_999, kind: .fixed),
+                Seed(monthOffset: m, day: 5, hour: 10, note: "Netflix", category: subs, cents: 1_549, kind: .fixed),
+                Seed(monthOffset: m, day: 7, hour: 10, note: "Spotify", category: subs, cents: 1_199, kind: .fixed),
+                Seed(monthOffset: m, day: 10, hour: 11, note: "Plan celular", category: "Otros", cents: 2_500, kind: .fixed),
+                Seed(monthOffset: m, day: 12, hour: 6, note: "iCloud+", category: subs, cents: 299, kind: .fixed),
             ]
         }
-        // Variables.
+        // Suscripción cancelada: su último cobro fue hace dos meses.
+        list.append(Seed(monthOffset: -2, day: 8, hour: 9, note: "Disney+", category: subs, cents: 1_399, kind: .fixed))
+
         list += [
             // Mes actual
-            Seed(monthOffset: 0, day: 1, hour: 13, note: "Almuerzo", category: "Comida", pesos: 8_500),
-            Seed(monthOffset: 0, day: 2, hour: 19, note: "Jumbo", category: "Supermercado", pesos: 54_320),
-            Seed(monthOffset: 0, day: 4, hour: 8, note: "Bip!", category: "Transporte", pesos: 10_000),
-            Seed(monthOffset: 0, day: 6, hour: 21, note: "Cena con amigos", category: "Comida", pesos: 42_000,
-                 debt: ("Juan", 21_000, .theyOweMe, false)),
-            Seed(monthOffset: 0, day: 8, hour: 17, note: "Farmacia", category: "Salud", pesos: 12_490),
-            Seed(monthOffset: 0, day: 9, hour: 20, note: "Cine", category: "Ocio", pesos: 14_000,
-                 debt: ("Camila", 7_000, .theyOweMe, false)),
-            Seed(monthOffset: 0, day: 11, hour: 23, note: "Uber", category: "Transporte", pesos: 6_800),
-            Seed(monthOffset: 0, day: 12, hour: 12, note: "Lider", category: "Supermercado", pesos: 23_150),
-            Seed(monthOffset: 0, day: 13, hour: 10, note: nil, category: "Comida", pesos: 3_200),
-            Seed(monthOffset: 0, day: 14, hour: 15, note: "Red Bull", category: "Comida", pesos: 2_500),
+            Seed(monthOffset: 0, day: 1, hour: 13, note: "Almuerzo", category: "Comida", cents: 1_250),
+            Seed(monthOffset: 0, day: 2, hour: 19, note: "Walmart", category: "Supermercado", cents: 8_640),
+            Seed(monthOffset: 0, day: 4, hour: 8, note: "Metro", category: "Transporte", cents: 2_000),
+            Seed(monthOffset: 0, day: 6, hour: 21, note: "Cena con amigos", category: "Comida", cents: 6_400,
+                 shared: ("Juan", 3_200, .theyOweMe, false)),
+            Seed(monthOffset: 0, day: 8, hour: 17, note: "Farmacia", category: "Salud", cents: 1_849),
+            Seed(monthOffset: 0, day: 9, hour: 20, note: "Cine", category: "Ocio", cents: 2_400,
+                 shared: ("Camila", 1_200, .theyOweMe, false)),
+            Seed(monthOffset: 0, day: 11, hour: 23, note: "Uber", category: "Transporte", cents: 1_375),
+            Seed(monthOffset: 0, day: 13, hour: 10, note: "Starbucks", category: "Comida", cents: 585),
+            Seed(monthOffset: 0, day: 14, hour: 15, note: "Red Bull", category: "Comida", cents: 325),
             // Mes anterior
-            Seed(monthOffset: -1, day: 2, hour: 18, note: "Jumbo", category: "Supermercado", pesos: 61_870),
-            Seed(monthOffset: -1, day: 4, hour: 13, note: "Sushi", category: "Comida", pesos: 18_900,
-                 debt: ("Pedro", 9_450, .theyOweMe, true)),
-            Seed(monthOffset: -1, day: 7, hour: 9, note: "Bencina", category: "Transporte", pesos: 45_000),
-            Seed(monthOffset: -1, day: 11, hour: 16, note: "Ferretería", category: "Hogar", pesos: 17_380),
-            Seed(monthOffset: -1, day: 15, hour: 22, note: "Concierto", category: "Ocio", pesos: 38_000,
-                 debt: ("Camila", 38_000, .iOweThem, false)),
-            Seed(monthOffset: -1, day: 18, hour: 11, note: "Dentista", category: "Salud", pesos: 35_000),
-            Seed(monthOffset: -1, day: 21, hour: 13, note: "Almuerzo", category: "Comida", pesos: 9_200),
-            Seed(monthOffset: -1, day: 24, hour: 19, note: "Lider", category: "Supermercado", pesos: 28_640),
-            Seed(monthOffset: -1, day: 27, hour: 8, note: "Bip!", category: "Transporte", pesos: 10_000),
-            Seed(monthOffset: -1, day: 29, hour: 20, note: "Regalo cumpleaños", category: "Otros", pesos: 25_000,
-                 debt: ("Sofía", 12_500, .iOweThem, false)),
+            Seed(monthOffset: -1, day: 2, hour: 18, note: "Walmart", category: "Supermercado", cents: 9_312),
+            Seed(monthOffset: -1, day: 4, hour: 13, note: "Sushi", category: "Comida", cents: 4_280,
+                 shared: ("Pedro", 2_140, .theyOweMe, true)),
+            Seed(monthOffset: -1, day: 7, hour: 9, note: "Gasolina", category: "Transporte", cents: 5_200),
+            Seed(monthOffset: -1, day: 11, hour: 16, note: "Ferretería", category: "Hogar", cents: 2_735),
+            Seed(monthOffset: -1, day: 15, hour: 22, note: "Concierto", category: "Ocio", cents: 8_500,
+                 shared: ("Camila", 4_250, .iOweThem, false)),
+            Seed(monthOffset: -1, day: 18, hour: 11, note: "Dentista", category: "Salud", cents: 12_000),
+            Seed(monthOffset: -1, day: 24, hour: 19, note: "Walmart", category: "Supermercado", cents: 6_430),
+            Seed(monthOffset: -1, day: 29, hour: 20, note: "Regalo cumpleaños", category: "Otros", cents: 4_000,
+                 shared: ("Sofía", 2_000, .iOweThem, false)),
             // Hace dos meses
-            Seed(monthOffset: -2, day: 3, hour: 19, note: "Jumbo", category: "Supermercado", pesos: 58_210),
-            Seed(monthOffset: -2, day: 6, hour: 14, note: "Completos", category: "Comida", pesos: 6_400),
-            Seed(monthOffset: -2, day: 9, hour: 7, note: "Uber al aeropuerto", category: "Transporte", pesos: 22_500,
-                 debt: ("Juan", 11_250, .iOweThem, true)),
-            Seed(monthOffset: -2, day: 12, hour: 17, note: "Lámpara", category: "Hogar", pesos: 24_990),
-            Seed(monthOffset: -2, day: 16, hour: 21, note: "Bar", category: "Ocio", pesos: 19_500),
-            Seed(monthOffset: -2, day: 19, hour: 10, note: "Exámenes", category: "Salud", pesos: 21_300),
-            Seed(monthOffset: -2, day: 23, hour: 13, note: nil, category: "Comida", pesos: 7_800),
-            Seed(monthOffset: -2, day: 26, hour: 18, note: "Feria", category: "Supermercado", pesos: 15_600),
+            Seed(monthOffset: -2, day: 3, hour: 19, note: "Walmart", category: "Supermercado", cents: 8_795),
+            Seed(monthOffset: -2, day: 9, hour: 7, note: "Uber al aeropuerto", category: "Transporte", cents: 3_850,
+                 shared: ("Juan", 1_925, .iOweThem, true)),
+            Seed(monthOffset: -2, day: 12, hour: 17, note: "Lámpara", category: "Hogar", cents: 3_999),
+            Seed(monthOffset: -2, day: 16, hour: 21, note: "Bar", category: "Ocio", cents: 4_650),
+            Seed(monthOffset: -2, day: 23, hour: 13, note: nil, category: "Comida", cents: 1_100),
         ]
         return list
     }()
@@ -82,19 +82,19 @@ nonisolated enum MockData {
             var comps = calendar.dateComponents([.year, .month], from: monthStart)
             comps.day = day
             comps.hour = seed.hour
-            comps.minute = (seed.pesos / 100) % 60
+            comps.minute = (seed.cents / 7) % 60
             guard var date = calendar.date(from: comps) else { return nil }
             if date > now { date = now.addingTimeInterval(-600) }
 
-            let debts = seed.debt.map { d in
-                [Debt(counterpartyName: d.name, amountCents: d.pesos * 100, direction: d.direction,
+            let debts = seed.shared.map { d in
+                [Debt(counterpartyName: d.name, amountCents: d.cents, direction: d.direction,
                       isSettled: d.settled, settledAt: d.settled ? date.addingTimeInterval(86_400 * 3) : nil)]
             } ?? []
 
             return Expense(
                 categoryId: category.id,
-                amountCents: seed.pesos * 100,
-                currency: "CLP",
+                amountCents: seed.cents,
+                currency: "USD",
                 kind: seed.kind,
                 note: seed.note,
                 spentAt: date,

@@ -6,8 +6,8 @@ enum RepositoryError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .notFound: "No se encontró el registro."
-        case .notAuthenticated: "Debes iniciar sesión."
+        case .notFound: String(localized: "No se encontró el registro.")
+        case .notAuthenticated: String(localized: "Debes iniciar sesión.")
         }
     }
 }
