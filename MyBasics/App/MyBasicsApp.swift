@@ -1,17 +1,13 @@
-//
-//  MyBasicsApp.swift
-//  MyBasics
-//
-//  Created by Sebastian Leon Cabanillas on 10/14/26.
-//
-
 import SwiftUI
 
 @main
 struct MyBasicsApp: App {
+    @State private var environment = AppEnvironment.mock()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PlaceholderHomeView()
+                .environment(environment)
         }
     }
 }
