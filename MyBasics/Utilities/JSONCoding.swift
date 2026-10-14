@@ -20,6 +20,11 @@ nonisolated enum JSONCoding {
         return encoder
     }
 
+    /// "2026-10-14T15:32:00.123Z" (UTC, con milisegundos).
+    static func iso8601String(_ date: Date) -> String {
+        date.formatted(Date.ISO8601FormatStyle(includingFractionalSeconds: true))
+    }
+
     /// Acepta "2026-10-14T15:32:00Z", "2026-10-14T15:32:00.123Z" y "2026-10-14T15:32:00.123456+00:00".
     static func parseISO8601(_ string: String) -> Date? {
         let withFraction = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
