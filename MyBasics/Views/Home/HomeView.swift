@@ -52,8 +52,8 @@ struct HomeView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("MyBasics")
-            .navigationBarTitleDisplayMode(.inline)
+            .contentMargins(.top, 8, for: .scrollContent)
+            .toolbar(.hidden, for: .navigationBar)
             .task(id: viewModel.month) { await viewModel.load() }
             .confirmationDialog(
                 "¿Eliminar este gasto?",
@@ -153,9 +153,9 @@ struct HomeView: View {
 
     private var emptyTitle: String {
         switch viewModel.filter {
-        case .all: "Sin gastos este mes"
-        case .fixed: "Sin gastos fijos este mes"
-        case .variable: "Sin gastos variables este mes"
+        case .all: String(localized: "Sin gastos este mes")
+        case .fixed: String(localized: "Sin gastos fijos este mes")
+        case .variable: String(localized: "Sin gastos variables este mes")
         }
     }
 }
@@ -164,7 +164,7 @@ struct HomeView: View {
     let env = AppEnvironment.mock()
     return HomeView(
         viewModel: HomeViewModel(repository: env.expenseRepository),
-        currency: "CLP", onEdit: { _ in }, onAdd: {}
+        currency: "USD", onEdit: { _ in }, onAdd: {}
     )
     .environment(env)
 }

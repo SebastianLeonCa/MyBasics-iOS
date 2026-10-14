@@ -13,7 +13,7 @@ struct CategoriesView: View {
             ForEach(viewModel.categories) { category in
                 HStack(spacing: 12) {
                     CategoryIcon(category: category, size: 32)
-                    Text(category.name)
+                    Text(verbatim: category.displayName)
                     Spacer()
                     if category.isDefault {
                         Text("Por defecto")

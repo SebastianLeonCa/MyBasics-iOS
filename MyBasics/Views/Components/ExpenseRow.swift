@@ -43,9 +43,11 @@ struct ExpenseRow: View {
             CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency),
             expense.kind.displayName,
         ]
-        if let category = expense.category?.name, category != expense.displayTitle { parts.insert(category, at: 1) }
+        if let category = expense.category?.displayName, category != expense.displayTitle { parts.insert(category, at: 1) }
         if let debt = expense.debts.first(where: { !$0.isSettled }) {
-            parts.append("\(debt.direction.displayName): \(debt.counterpartyName)")
+            parts.append(debt.direction == .theyOweMe
+                ? String(localized: "\(debt.counterpartyName) te debe")
+                : String(localized: "Le debes a \(debt.counterpartyName)"))
         }
         return parts.joined(separator: ", ")
     }

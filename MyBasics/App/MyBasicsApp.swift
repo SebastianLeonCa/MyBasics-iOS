@@ -8,7 +8,6 @@ struct MyBasicsApp: App {
         WindowGroup {
             RootView(environment: environment)
                 .environment(environment)
-                .environment(\.locale, CurrencyFormatter.locale)
         }
     }
 }

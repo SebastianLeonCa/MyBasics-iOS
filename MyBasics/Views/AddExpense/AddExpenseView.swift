@@ -89,7 +89,10 @@ struct AddExpenseView: View {
                 Text(CurrencyFormatter.symbol(for: viewModel.currency))
                     .font(.system(.title, design: .rounded, weight: .semibold))
                     .foregroundStyle(.secondary)
-                TextField("0", text: $viewModel.amountText)
+                TextField(amountPlaceholder, text: Binding(
+                    get: { viewModel.amountText },
+                    set: { viewModel.setAmountText($0) }
+                ))
                     .font(.system(.largeTitle, design: .rounded, weight: .bold))
                     .keyboardType(viewModel.usesDecimals ? .decimalPad : .numberPad)
                     .focused($focusedField, equals: .amount)
@@ -111,7 +114,7 @@ struct AddExpenseView: View {
                     Spacer()
                     Text(CurrencyFormatter.symbol(for: viewModel.currency))
                         .foregroundStyle(.secondary)
-                    TextField("0", text: Binding(
+                    TextField(amountPlaceholder, text: Binding(
                         get: { viewModel.debtAmountText },
                         set: { viewModel.setDebtAmountText($0) }
                     ))
@@ -119,22 +122,29 @@ struct AddExpenseView: View {
                     .multilineTextAlignment(.trailing)
                     .fixedSize()
                     .focused($focusedField, equals: .debtAmount)
-                    .accessibilityLabel("Monto de la deuda")
+                    .accessibilityLabel("Monto compartido")
                 }
 
-                Picker("Dirección", selection: $viewModel.debtDirection) {
+                Picker("¿Quién le debe a quién?", selection: $viewModel.debtDirection) {
                     ForEach(DebtDirection.allCases) { Text($0.displayName).tag($0) }
                 }
                 .pickerStyle(.segmented)
             } label: {
-                Label("¿Deuda?", systemImage: "person.2")
+                Label("Compartido con alguien", systemImage: "person.2")
             }
         } footer: {
             if viewModel.hasDebt && !viewModel.isDebtValid {
                 Text("Indica la persona y un monto mayor que 0 y no mayor al gasto.")
                     .foregroundStyle(.red)
+            } else if viewModel.hasDebt {
+                Text("Aparecerá en Compartidos hasta que lo marques como pagado.")
             }
         }
+    }
+
+    /// "0.00" o "0,00" según el dispositivo ("0" si la moneda no usa decimales).
+    private var amountPlaceholder: String {
+        viewModel.usesDecimals ? "0\(CurrencyFormatter.decimalSeparator())00" : "0"
     }
 
     private func save() {

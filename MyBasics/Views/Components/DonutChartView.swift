@@ -36,7 +36,7 @@ struct DonutChartView: View {
                 if let plotFrame = proxy.plotFrame {
                     let frame = geo[plotFrame]
                     centerLabel
-                        .frame(width: frame.width * innerRatio * 0.8)
+                        .frame(width: frame.width * innerRatio * 0.72)
                         .position(x: frame.midX, y: frame.midY)
                 }
             }
@@ -58,7 +58,7 @@ struct DonutChartView: View {
     @ViewBuilder
     private var centerLabel: some View {
         VStack(spacing: 2) {
-            Text(selected?.name ?? "Total")
+            Text(selected?.name ?? String(localized: "Total"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(CurrencyFormatter.string(fromCents: selected?.amountCents ?? totalCents, currency: currency))
@@ -98,6 +98,6 @@ struct DonutChartView: View {
     }
 
     private func percent(_ share: Double) -> String {
-        share.formatted(.percent.precision(.fractionLength(0)).locale(CurrencyFormatter.locale))
+        share.formatted(.percent.precision(.fractionLength(0)))
     }
 }

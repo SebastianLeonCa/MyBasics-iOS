@@ -34,7 +34,7 @@ struct CategoryChipsView: View {
         return Button {
             withAnimation(.snappy) { selection = category.id }
         } label: {
-            Label(category.name, systemImage: category.icon)
+            Label(category.displayName, systemImage: category.icon)
                 .font(.subheadline.weight(.medium))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
@@ -43,7 +43,7 @@ struct CategoryChipsView: View {
                 .overlay(Capsule().strokeBorder(color.opacity(isSelected ? 0 : 0.5), lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(category.name)
+        .accessibilityLabel(category.displayName)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
