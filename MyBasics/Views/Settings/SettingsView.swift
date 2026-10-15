@@ -12,69 +12,75 @@ struct SettingsView: View {
         @Bindable var env = env
         NavigationStack {
             List {
-                Section {
-                    Picker(selection: $env.currency) {
-                        ForEach(CurrencyOptions.codes, id: \.self) { code in
-                            Text(verbatim: CurrencyOptions.displayName(for: code)).tag(code)
-                        }
-                    } label: {
-                        Label("Moneda", systemImage: "dollarsign.circle")
-                    }
-                    .pickerStyle(.navigationLink)
-                } footer: {
-                    Text("Se usa en los gastos nuevos y en los totales. Los gastos ya guardados conservan su moneda.")
-                }
-
-                Section {
-                    NavigationLink {
-                        CategoriesView(repository: env.categoryRepository)
-                    } label: {
-                        Label("Categorías", systemImage: "square.grid.2x2")
-                    }
-                    NavigationLink {
-                        ExportView(repository: env.expenseRepository, currency: env.currency)
-                    } label: {
-                        Label("Exportar mes (CSV)", systemImage: "square.and.arrow.up")
-                    }
-                }
-
-                Section {
-                    Button {
-                        // Abre los ajustes de la app en iOS, donde se elige el idioma de la app.
-                        if let url = URL(string: "app-settings:") { openURL(url) }
-                    } label: {
-                        LabeledContent {
-                            Text(verbatim: currentLanguageName)
+                Group {
+                    Section {
+                        Picker(selection: $env.currency) {
+                            ForEach(CurrencyOptions.codes, id: \.self) { code in
+                                Text(verbatim: CurrencyOptions.displayName(for: code)).tag(code)
+                            }
                         } label: {
-                            Label("Idioma", systemImage: "globe")
+                            Label("Moneda", systemImage: "dollarsign.circle")
+                        }
+                        .pickerStyle(.navigationLink)
+                    } footer: {
+                        Text("Se usa en los gastos nuevos y en los totales. Los gastos ya guardados conservan su moneda.")
+                    }
+
+                    Section {
+                        NavigationLink {
+                            CategoriesView(repository: env.categoryRepository)
+                        } label: {
+                            Label("Categorías", systemImage: "square.grid.2x2")
+                        }
+                        NavigationLink {
+                            ExportView(repository: env.expenseRepository, currency: env.currency)
+                        } label: {
+                            Label("Exportar mes (CSV)", systemImage: "square.and.arrow.up")
                         }
                     }
-                    .foregroundStyle(.primary)
-                    LabeledContent {
-                        Text(env.dataSource == .supabase ? "Supabase" : String(localized: "Ejemplo (sin conexión)"))
-                    } label: {
-                        Label("Datos", systemImage: env.dataSource == .supabase ? "icloud" : "internaldrive")
+
+                    Section {
+                        Button {
+                            // Abre los ajustes de la app en iOS, donde se elige el idioma de la app.
+                            if let url = URL(string: "app-settings:") { openURL(url) }
+                        } label: {
+                            LabeledContent {
+                                Text(verbatim: currentLanguageName)
+                            } label: {
+                                Label("Idioma", systemImage: "globe")
+                            }
+                        }
+                        .foregroundStyle(.primary)
+                        LabeledContent {
+                            Text(env.dataSource == .supabase ? "Supabase" : String(localized: "Ejemplo (sin conexión)"))
+                        } label: {
+                            Label("Datos", systemImage: env.dataSource == .supabase ? "icloud" : "internaldrive")
+                        }
+                    } footer: {
+                        if env.dataSource == .supabase {
+                            Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma.")
+                        } else {
+                            Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app. Completa Config/Secrets.xcconfig para usar Supabase.")
+                        }
                     }
-                } footer: {
-                    if env.dataSource == .supabase {
-                        Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma.")
-                    } else {
-                        Text("El idioma se cambia en Ajustes de iOS › MyBasics › Idioma. Datos de ejemplo en memoria: se reinician al cerrar la app. Completa Config/Secrets.xcconfig para usar Supabase.")
+
+                    accountSection
+
+                    Section {
+                        LabeledContent("Versión", value: appVersion)
                     }
                 }
-
-                accountSection
-
-                Section {
-                    LabeledContent("Versión", value: appVersion)
-                }
+                .themedRows()
             }
             .navigationTitle("Ajustes")
+            .themedScreen()
             .disabled(isWorking)
-            .overlay { if isWorking { ProgressView().controlSize(.large) } }
-            .confirmationDialog("¿Cerrar sesión?", isPresented: $confirmingSignOut, titleVisibility: .visible) {
-                Button("Cerrar sesión", role: .destructive) { run(env.signOut) }
-                Button("Cancelar", role: .cancel) {}
+            .overlay { if isWorking { ProgressView().controlSize(.large).tint(Theme.accent) } }
+            .alert("¿Seguro que quieres cerrar sesión?", isPresented: $confirmingSignOut) {
+                Button("No", role: .cancel) {}
+                Button("Sí, cerrar sesión", role: .destructive) { run(env.signOut) }
+            } message: {
+                Text("Tus datos quedan guardados en tu cuenta; vuelve a entrar cuando quieras.")
             }
             .alert("¿Eliminar tu cuenta?", isPresented: $confirmingDelete) {
                 Button("Eliminar cuenta", role: .destructive) { run(env.deleteAccount) }
