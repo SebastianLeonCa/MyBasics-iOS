@@ -13,40 +13,44 @@ struct SharedView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack(spacing: 12) {
-                        totalTile(title: "Te deben", cents: viewModel.owedToMeCents, color: .green,
-                                  icon: "arrow.down.left")
-                        totalTile(title: "Debes", cents: viewModel.iOweCents, color: .orange,
-                                  icon: "arrow.up.right")
+                Group {
+                    Section {
+                        HStack(spacing: 12) {
+                            totalTile(title: "Te deben", cents: viewModel.owedToMeCents, color: Theme.positive,
+                                      icon: "arrow.down.left")
+                            totalTile(title: "Debes", cents: viewModel.iOweCents, color: Theme.negative,
+                                      icon: "arrow.up.right")
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     }
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-                }
 
-                if let loadError = viewModel.loadError {
-                    LoadErrorView(message: loadError) { await viewModel.load() }
-                } else if !viewModel.hasLoaded {
-                    Section { SkeletonRows(count: 3) }
-                } else if viewModel.shares.isEmpty {
-                    ContentUnavailableView(
-                        "Todo al día",
-                        systemImage: "checkmark.circle",
-                        description: Text("Cuando compartas un gasto con alguien, aparecerá aquí hasta que se pague.")
-                    )
-                } else {
-                    ForEach(viewModel.balances) { balance in
-                        Section {
-                            ForEach(balance.items) { share in
-                                row(share)
+                    if let loadError = viewModel.loadError {
+                        LoadErrorView(message: loadError) { await viewModel.load() }
+                    } else if !viewModel.hasLoaded {
+                        Section { SkeletonRows(count: 3) }
+                    } else if viewModel.shares.isEmpty {
+                        ContentUnavailableView(
+                            "Todo al día",
+                            systemImage: "checkmark.circle",
+                            description: Text("Cuando compartas un gasto con alguien, aparecerá aquí hasta que se pague.")
+                        )
+                    } else {
+                        ForEach(viewModel.balances) { balance in
+                            Section {
+                                ForEach(balance.items) { share in
+                                    row(share)
+                                }
+                            } header: {
+                                header(for: balance)
                             }
-                        } header: {
-                            header(for: balance)
                         }
                     }
                 }
+                .themedRows()
             }
             .navigationTitle("Compartidos")
+            .themedScreen()
             .task { await viewModel.load() }
             .refreshable { await viewModel.load() }
             .sensoryFeedback(.success, trigger: viewModel.paidFeedback)
@@ -64,9 +68,9 @@ struct SharedView: View {
             Spacer()
             Group {
                 if balance.netCents > 0 {
-                    Text("Te debe \(amount)").foregroundStyle(.green)
+                    Text("Te debe \(amount)").foregroundStyle(Theme.positive)
                 } else if balance.netCents < 0 {
-                    Text("Le debes \(amount)").foregroundStyle(.orange)
+                    Text("Le debes \(amount)").foregroundStyle(Theme.negative)
                 } else {
                     Text("A mano")
                 }
@@ -81,15 +85,13 @@ struct SharedView: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(color)
             Text(CurrencyFormatter.string(fromCents: cents, currency: currency))
-                .font(.title3.weight(.bold))
-                .monospacedDigit()
+                .font(Theme.amount(.title2))
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+        .card()
         .accessibilityElement(children: .combine)
     }
 
@@ -111,17 +113,17 @@ struct SharedView: View {
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(CurrencyFormatter.string(fromCents: share.debt.amountCents, currency: share.expense.currency))
-                    .font(.body.weight(.semibold))
-                    .monospacedDigit()
+                    .font(Theme.amount(.body, weight: .semibold))
                 Text(verbatim: share.debt.direction.displayName)
                     .font(.caption)
-                    .foregroundStyle(theyOweMe ? .green : .orange)
+                    .foregroundStyle(theyOweMe ? Theme.positive : Theme.negative)
             }
             Button {
                 Task { await viewModel.markPaid(share) }
             } label: {
                 Image(systemName: "checkmark.circle")
                     .font(.title2)
+                    .foregroundStyle(Theme.accent)
             }
             .buttonStyle(.borderless)
             .accessibilityLabel("Marcar como pagado")
@@ -132,7 +134,7 @@ struct SharedView: View {
             } label: {
                 Label("Pagado", systemImage: "checkmark")
             }
-            .tint(.green)
+            .tint(Theme.accentDeep)
         }
         .accessibilityElement(children: .combine)
         .accessibilityAction(named: "Marcar como pagado") {

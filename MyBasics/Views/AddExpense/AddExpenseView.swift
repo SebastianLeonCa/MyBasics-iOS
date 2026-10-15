@@ -21,49 +21,52 @@ struct AddExpenseView: View {
     var body: some View {
         NavigationStack {
             Form {
-                amountSection
+                Group {
+                    amountSection
 
-                Section("Categoría") {
-                    if let error = viewModel.categoriesError, viewModel.categories.isEmpty {
-                        HStack {
-                            Text(error)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Button("Reintentar") { Task { await viewModel.loadCategories() } }
-                                .buttonStyle(.borderless)
+                    Section("Categoría") {
+                        if let error = viewModel.categoriesError, viewModel.categories.isEmpty {
+                            HStack {
+                                Text(error)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Button("Reintentar") { Task { await viewModel.loadCategories() } }
+                                    .buttonStyle(.borderless)
+                            }
+                        } else if viewModel.isLoadingCategories && viewModel.categories.isEmpty {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                                .accessibilityLabel("Cargando categorías")
+                        } else {
+                            CategoryChipsView(
+                                categories: viewModel.categories,
+                                selection: $viewModel.categoryId,
+                                onNew: { showingNewCategory = true }
+                            )
+                            .listRowInsets(EdgeInsets())
                         }
-                    } else if viewModel.isLoadingCategories && viewModel.categories.isEmpty {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                            .accessibilityLabel("Cargando categorías")
-                    } else {
-                        CategoryChipsView(
-                            categories: viewModel.categories,
-                            selection: $viewModel.categoryId,
-                            onNew: { showingNewCategory = true }
-                        )
-                        .listRowInsets(EdgeInsets())
                     }
-                }
 
-                Section {
-                    Picker("Tipo", selection: $viewModel.kind) {
-                        ForEach(ExpenseKind.allCases) { Text($0.displayName).tag($0) }
+                    Section {
+                        PillPicker(options: ExpenseKind.allCases, selection: $viewModel.kind, title: \.displayName)
+                            .accessibilityLabel("Tipo")
+                            .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
+
+                        TextField("Descripción (opcional)", text: $viewModel.note)
+                            .focused($focusedField, equals: .note)
+                            .submitLabel(.done)
+
+                        DatePicker("Fecha", selection: $viewModel.spentAt, in: ...Date.now)
+                            .foregroundStyle(.secondary)
                     }
-                    .pickerStyle(.segmented)
 
-                    TextField("Descripción (opcional)", text: $viewModel.note)
-                        .focused($focusedField, equals: .note)
-                        .submitLabel(.done)
-
-                    DatePicker("Fecha", selection: $viewModel.spentAt, in: ...Date.now)
-                        .foregroundStyle(.secondary)
+                    debtSection
                 }
-
-                debtSection
+                .themedRows()
             }
             .navigationTitle(viewModel.title)
+            .themedScreen()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -90,6 +93,8 @@ struct AddExpenseView: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .presentationBackground(Theme.background)
+        .presentationCornerRadius(28)
     }
 
     private var amountSection: some View {
@@ -97,7 +102,7 @@ struct AddExpenseView: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(CurrencyFormatter.symbol(for: viewModel.currency))
                     .font(.system(.title, design: .rounded, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Theme.accent)
                 TextField(amountPlaceholder, text: Binding(
                     get: { viewModel.amountText },
                     set: { viewModel.setAmountText($0) }
@@ -134,10 +139,8 @@ struct AddExpenseView: View {
                     .accessibilityLabel("Monto compartido")
                 }
 
-                Picker("¿Quién le debe a quién?", selection: $viewModel.debtDirection) {
-                    ForEach(DebtDirection.allCases) { Text($0.displayName).tag($0) }
-                }
-                .pickerStyle(.segmented)
+                PillPicker(options: DebtDirection.allCases, selection: $viewModel.debtDirection, title: \.displayName)
+                    .accessibilityLabel("¿Quién le debe a quién?")
             } label: {
                 Label("Compartido con alguien", systemImage: "person.2")
             }

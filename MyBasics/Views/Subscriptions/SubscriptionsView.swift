@@ -12,53 +12,57 @@ struct SubscriptionsView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Gasto mensual en suscripciones")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Text(CurrencyFormatter.string(
-                            fromCents: viewModel.monthlyTotalCents,
-                            currency: viewModel.currency ?? CurrencyFormatter.defaultCurrency))
-                            .font(.largeTitle.weight(.bold))
-                            .monospacedDigit()
-                            .contentTransition(.numericText())
-                        Text("\(viewModel.active.count) activas")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                Group {
+                    Section {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Gasto mensual en suscripciones")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Text(CurrencyFormatter.string(
+                                fromCents: viewModel.monthlyTotalCents,
+                                currency: viewModel.currency ?? CurrencyFormatter.defaultCurrency))
+                                .font(Theme.amount(.largeTitle))
+                                .foregroundStyle(Theme.accent)
+                                .contentTransition(.numericText())
+                            Text("\(viewModel.active.count) activas")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                        .accessibilityElement(children: .combine)
                     }
-                    .padding(.vertical, 4)
-                    .accessibilityElement(children: .combine)
-                }
 
-                if let loadError = viewModel.loadError {
-                    LoadErrorView(message: loadError) { await viewModel.load() }
-                } else if !viewModel.hasLoaded {
-                    Section { SkeletonRows(count: 3) }
-                } else if viewModel.summaries.isEmpty {
-                    ContentUnavailableView(
-                        "Sin suscripciones",
-                        systemImage: "repeat.circle",
-                        description: Text("Registra un gasto en la categoría Suscripciones (por ejemplo, Netflix) y aparecerá aquí.")
-                    )
-                } else {
-                    if !viewModel.active.isEmpty {
-                        Section("Activas") {
-                            ForEach(viewModel.active) { row($0) }
+                    if let loadError = viewModel.loadError {
+                        LoadErrorView(message: loadError) { await viewModel.load() }
+                    } else if !viewModel.hasLoaded {
+                        Section { SkeletonRows(count: 3) }
+                    } else if viewModel.summaries.isEmpty {
+                        ContentUnavailableView(
+                            "Sin suscripciones",
+                            systemImage: "repeat.circle",
+                            description: Text("Registra un gasto en la categoría Suscripciones (por ejemplo, Netflix) y aparecerá aquí.")
+                        )
+                    } else {
+                        if !viewModel.active.isEmpty {
+                            Section("Activas") {
+                                ForEach(viewModel.active) { row($0) }
+                            }
                         }
-                    }
-                    if !viewModel.inactive.isEmpty {
-                        Section {
-                            ForEach(viewModel.inactive) { row($0) }
-                        } header: {
-                            Text("Inactivas")
-                        } footer: {
-                            Text("Sin cobros en los últimos \(SubscriptionAnalytics.activeWindowDays) días.")
+                        if !viewModel.inactive.isEmpty {
+                            Section {
+                                ForEach(viewModel.inactive) { row($0) }
+                            } header: {
+                                Text("Inactivas")
+                            } footer: {
+                                Text("Sin cobros en los últimos \(SubscriptionAnalytics.activeWindowDays) días.")
+                            }
                         }
                     }
                 }
+                .themedRows()
             }
             .navigationTitle("Suscripciones")
+            .themedScreen()
             .task { await viewModel.load() }
             .refreshable { await viewModel.load() }
 
@@ -85,8 +89,7 @@ struct SubscriptionsView: View {
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(CurrencyFormatter.string(fromCents: item.lastAmountCents, currency: item.currency))
-                    .font(.body.weight(.semibold))
-                    .monospacedDigit()
+                    .font(Theme.amount(.body, weight: .semibold))
                     .foregroundStyle(item.isActive ? .primary : .secondary)
                 if item.isActive {
                     Text("al mes")

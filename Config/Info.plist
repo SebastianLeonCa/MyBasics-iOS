@@ -21,6 +21,9 @@
 			</array>
 		</dict>
 	</array>
+	<!-- La app es solo de modo oscuro. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

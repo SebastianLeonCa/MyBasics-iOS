@@ -28,65 +28,69 @@ struct NewCategoryView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    HStack(spacing: 12) {
-                        CategoryIcon(icon: icon, colorHex: colorHex, size: 44)
-                        TextField("Nombre", text: $name)
-                            .font(.title3)
-                            .focused($nameFocused)
-                            .submitLabel(.done)
+                Group {
+                    Section {
+                        HStack(spacing: 12) {
+                            CategoryIcon(icon: icon, colorHex: colorHex, size: 44)
+                            TextField("Nombre", text: $name)
+                                .font(.title3)
+                                .focused($nameFocused)
+                                .submitLabel(.done)
+                        }
                     }
-                }
 
-                Section("Color") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
-                        ForEach(Self.palette, id: \.self) { hex in
-                            Button {
-                                colorHex = hex
-                            } label: {
-                                Circle()
-                                    .fill(Color(hex: hex) ?? .gray)
-                                    .frame(width: 34, height: 34)
-                                    .overlay {
-                                        if hex == colorHex {
-                                            Image(systemName: "checkmark")
-                                                .font(.caption.weight(.bold))
-                                                .foregroundStyle(.white)
+                    Section("Color") {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                            ForEach(Self.palette, id: \.self) { hex in
+                                Button {
+                                    colorHex = hex
+                                } label: {
+                                    Circle()
+                                        .fill(Color(hex: hex) ?? .gray)
+                                        .frame(width: 34, height: 34)
+                                        .overlay {
+                                            if hex == colorHex {
+                                                Image(systemName: "checkmark")
+                                                    .font(.caption.weight(.bold))
+                                                    .foregroundStyle(.white)
+                                            }
                                         }
-                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel("Color \(hex)")
+                                .accessibilityAddTraits(hex == colorHex ? .isSelected : [])
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Color \(hex)")
-                            .accessibilityAddTraits(hex == colorHex ? .isSelected : [])
                         }
+                        .padding(.vertical, 6)
                     }
-                    .padding(.vertical, 6)
-                }
 
-                Section("Ícono") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
-                        ForEach(Self.icons, id: \.self) { symbol in
-                            Button {
-                                icon = symbol
-                            } label: {
-                                Image(systemName: symbol)
-                                    .font(.title3)
-                                    .frame(width: 40, height: 40)
-                                    .foregroundStyle(symbol == icon ? .white : .primary)
-                                    .background(
-                                        symbol == icon ? (Color(hex: colorHex) ?? .gray) : Color.secondary.opacity(0.12),
-                                        in: Circle()
-                                    )
+                    Section("Ícono") {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                            ForEach(Self.icons, id: \.self) { symbol in
+                                Button {
+                                    icon = symbol
+                                } label: {
+                                    Image(systemName: symbol)
+                                        .font(.title3)
+                                        .frame(width: 40, height: 40)
+                                        .foregroundStyle(symbol == icon ? .white : .primary)
+                                        .background(
+                                            symbol == icon ? (Color(hex: colorHex) ?? .gray) : Theme.surfaceRaised,
+                                            in: Circle()
+                                        )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(symbol)
+                                .accessibilityAddTraits(symbol == icon ? .isSelected : [])
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(symbol)
-                            .accessibilityAddTraits(symbol == icon ? .isSelected : [])
                         }
+                        .padding(.vertical, 6)
                     }
-                    .padding(.vertical, 6)
                 }
+                .themedRows()
             }
             .navigationTitle("Nueva categoría")
+            .themedScreen()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -108,6 +112,7 @@ struct NewCategoryView: View {
                 Text(errorMessage ?? "")
             }
         }
+        .presentationBackground(Theme.background)
     }
 
     private func save() {

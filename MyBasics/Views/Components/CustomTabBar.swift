@@ -24,31 +24,42 @@ enum AppTab: Hashable, CaseIterable {
     var selectedIcon: String { icon + ".fill" }
 }
 
-/// Barra inferior: dos pestañas a cada lado de un botón "+" redondo y flotante.
+/// Barra inferior flotante: dos pestañas a cada lado de un botón "+" redondo y brillante.
 struct CustomTabBar: View {
     @Binding var selection: AppTab
     let onAdd: () -> Void
     @State private var addTaps = 0
 
-    @ScaledMetric(relativeTo: .title) private var plusSize: CGFloat = 64
+    @ScaledMetric(relativeTo: .title) private var plusSize: CGFloat = 60
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
+        HStack(alignment: .center, spacing: 0) {
             tabButton(.home)
             tabButton(.shared)
-            Color.clear.frame(width: plusSize + 12, height: 1)
+            addButton
+                .padding(.horizontal, 6)
+                .offset(y: -14)
             tabButton(.subscriptions)
             tabButton(.settings)
         }
         .padding(.horizontal, 8)
-        .padding(.top, 8)
-        .background(alignment: .top) {
-            Rectangle()
-                .fill(.bar)
-                .overlay(alignment: .top) { Divider() }
-                .ignoresSafeArea(edges: .bottom)
+        .frame(height: 64)
+        .background {
+            Capsule(style: .continuous)
+                .fill(Theme.surface.opacity(0.92))
+                .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+                .overlay(Capsule(style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
+                .shadow(color: .black.opacity(0.45), radius: 18, y: 8)
         }
-        .overlay(alignment: .top) { addButton.offset(y: -plusSize / 2) }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 6)
+        .background(alignment: .bottom) {
+            // Difumina el contenido que pasa por debajo de la barra.
+            LinearGradient(colors: [Theme.background.opacity(0), Theme.background], startPoint: .top, endPoint: .bottom)
+                .frame(height: 110)
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(false)
+        }
         // Como la barra estándar de iOS: tamaño acotado y, con texto grande, pulsación larga
         // muestra el "Visor de contenido grande".
         .dynamicTypeSize(...DynamicTypeSize.xLarge)
@@ -62,11 +73,12 @@ struct CustomTabBar: View {
             onAdd()
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: plusSize * 0.42, weight: .bold))
-                .foregroundStyle(.white)
+                .font(.system(size: plusSize * 0.4, weight: .bold))
+                .foregroundStyle(.black)
                 .frame(width: plusSize, height: plusSize)
-                .background(Color.accentColor, in: Circle())
-                .shadow(color: .black.opacity(0.18), radius: 10, y: 5)
+                .background(Theme.accentGradient, in: Circle())
+                .overlay(Circle().strokeBorder(.white.opacity(0.25), lineWidth: 1))
+                .shadow(color: Theme.accent.opacity(0.55), radius: 14, y: 4)
                 .symbolEffect(.bounce, value: addTaps)
         }
         .buttonStyle(PressScaleButtonStyle())
@@ -78,20 +90,21 @@ struct CustomTabBar: View {
     }
 
     private func tabButton(_ tab: AppTab) -> some View {
-        Button {
+        let isSelected = selection == tab
+        return Button {
             selection = tab
         } label: {
-            VStack(spacing: 4) {
-                Image(systemName: selection == tab ? tab.selectedIcon : tab.icon)
-                    .font(.title3)
-                    .symbolEffect(.bounce, value: selection == tab)
+            VStack(spacing: 3) {
+                Image(systemName: isSelected ? tab.selectedIcon : tab.icon)
+                    .font(.system(size: 19, weight: .semibold))
+                    .symbolEffect(.bounce, value: isSelected)
                 Text(tab.title)
-                    .font(.caption2.weight(.medium))
+                    .font(.caption2.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
-            .foregroundStyle(selection == tab ? Color.accentColor : .secondary)
-            .frame(maxWidth: .infinity)
+            .foregroundStyle(isSelected ? Theme.accent : Theme.textTertiary)
+            .frame(maxWidth: .infinity, minHeight: 52)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -99,7 +112,7 @@ struct CustomTabBar: View {
             Image(systemName: tab.icon)
             Text(tab.title)
         }
-        .accessibilityAddTraits(selection == tab ? [.isSelected] : [])
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 }
 

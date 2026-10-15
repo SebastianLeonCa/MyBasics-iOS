@@ -14,14 +14,14 @@ struct ExpenseRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(expense.displayTitle)
-                    .font(.body)
+                    .font(.body.weight(.medium))
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     KindBadge(kind: expense.kind)
                     if expense.hasPendingDebt, let debt = expense.debts.first(where: { !$0.isSettled }) {
                         Label(debt.counterpartyName, systemImage: "person.2.fill")
-                            .font(.caption)
-                            .foregroundStyle(.orange)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(Theme.negative)
                             .lineLimit(1)
                     }
                 }
@@ -30,10 +30,9 @@ struct ExpenseRow: View {
             if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
 
             Text(CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency))
-                .font(.body.weight(.semibold))
-                .monospacedDigit()
+                .font(Theme.amount(.body, weight: .semibold))
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
     }

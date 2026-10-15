@@ -22,9 +22,9 @@ struct DonutChartView: View {
                 angle: .value("Monto", item.amountCents),
                 innerRadius: .ratio(innerRatio),
                 outerRadius: .ratio(item.categoryId == selectedCategoryId ? 1 : 0.94),
-                angularInset: 1.5
+                angularInset: 2
             )
-            .cornerRadius(4)
+            .cornerRadius(6)
             .foregroundStyle(Color(hex: item.colorHex) ?? .gray)
             .opacity(selectedCategoryId == nil || item.categoryId == selectedCategoryId ? 1 : 0.35)
             .accessibilityLabel(item.name)
@@ -62,13 +62,14 @@ struct DonutChartView: View {
     private var centerLabel: some View {
         VStack(spacing: 2) {
             Text(selected?.name ?? String(localized: "Total"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Theme.textSecondary)
             // El primer tamaño que quepa en el hueco del donut.
             ViewThatFits(in: .horizontal) {
                 ForEach([Font.title2, .headline, .subheadline, .footnote], id: \.self) { font in
                     Text(CurrencyFormatter.string(fromCents: selected?.amountCents ?? totalCents, currency: currency))
                         .font(font.weight(.bold))
+                        .fontDesign(.rounded)
                         .monospacedDigit()
                         .contentTransition(.numericText())
                         .fixedSize()

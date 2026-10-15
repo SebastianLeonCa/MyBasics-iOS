@@ -9,29 +9,35 @@ struct MonthNavigator: View {
 
     var body: some View {
         HStack {
-            Button(action: onPrevious) {
-                Image(systemName: "chevron.left")
-                    .frame(width: 44, height: 44)
-            }
-            .accessibilityLabel("Mes anterior")
+            chevron("chevron.left", action: onPrevious)
+                .accessibilityLabel("Mes anterior")
 
             Spacer()
 
             Text(title)
-                .font(.headline)
+                .font(.system(.title3, design: .rounded, weight: .bold))
                 .contentTransition(.numericText())
                 .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
-            Button(action: onNext) {
-                Image(systemName: "chevron.right")
-                    .frame(width: 44, height: 44)
-            }
-            .disabled(!canGoForward)
-            .accessibilityLabel("Mes siguiente")
+            chevron("chevron.right", action: onNext)
+                .disabled(!canGoForward)
+                .opacity(canGoForward ? 1 : 0.3)
+                .accessibilityLabel("Mes siguiente")
         }
-        .font(.body.weight(.semibold))
         .buttonStyle(.borderless)
+    }
+
+    private func chevron(_ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 40, height: 40)
+                .background(Theme.surfaceRaised, in: Circle())
+                .overlay(Circle().strokeBorder(Theme.stroke, lineWidth: 1))
+                .frame(width: 44, height: 44)
+        }
     }
 }

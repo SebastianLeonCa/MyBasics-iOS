@@ -24,22 +24,22 @@ struct CategoryLegendView: View {
                             if !dynamicTypeSize.isAccessibilitySize { Spacer() }
                             HStack(spacing: 10) {
                                 Text(CurrencyFormatter.string(fromCents: item.amountCents, currency: currency))
-                                    .monospacedDigit()
+                                    .font(Theme.amount(.subheadline, weight: .semibold))
                                     .foregroundStyle(.primary)
                                 Text(item.share.formatted(.percent.precision(.fractionLength(0))))
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
+                                    .font(Theme.amount(.subheadline, weight: .medium))
+                                    .foregroundStyle(Theme.textTertiary)
                                     .frame(minWidth: 44, alignment: .trailing)
                             }
                         }
                         if dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 0) }
                     }
                     .font(.subheadline)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 8)
+                    .padding(.vertical, 7)
+                    .padding(.horizontal, 10)
                     .background(
-                        item.categoryId == selectedCategoryId ? Color.secondary.opacity(0.12) : .clear,
-                        in: RoundedRectangle(cornerRadius: 8)
+                        item.categoryId == selectedCategoryId ? Theme.surfaceRaised : .clear,
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                     )
                     .contentShape(Rectangle())
                 }

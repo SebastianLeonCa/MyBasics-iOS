@@ -33,6 +33,7 @@ struct LoadErrorView: View {
         } actions: {
             Button("Reintentar") { Task { await retry() } }
                 .buttonStyle(.borderedProminent)
+                .foregroundStyle(.black)
         }
     }
 }
@@ -52,7 +53,7 @@ struct SkeletonRows: View {
                 Spacer()
                 Text(verbatim: "$00.00").fontWeight(.semibold)
             }
-            .foregroundStyle(.secondary.opacity(0.4))
+            .foregroundStyle(Theme.surfaceRaised)
             .redacted(reason: .placeholder)
             .accessibilityHidden(true)
         }

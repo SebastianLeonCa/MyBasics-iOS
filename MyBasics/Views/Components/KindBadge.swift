@@ -9,9 +9,9 @@ struct KindBadge: View {
             .font(.caption2.weight(.semibold))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .foregroundStyle(kind == .fixed ? Color.indigo : Color.secondary)
+            .foregroundStyle(kind == .fixed ? Theme.accent : Theme.textSecondary)
             .background(
-                (kind == .fixed ? Color.indigo : Color.secondary).opacity(0.15),
+                (kind == .fixed ? Theme.accent : Color.white).opacity(kind == .fixed ? 0.14 : 0.08),
                 in: Capsule()
             )
     }

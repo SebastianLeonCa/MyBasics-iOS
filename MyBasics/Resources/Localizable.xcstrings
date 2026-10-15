@@ -579,6 +579,16 @@
         }
       }
     },
+    "Falta GOOGLE_IOS_CLIENT_ID en Config/Secrets.xcconfig. Los pasos están en docs/AUTH_SETUP.md.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GOOGLE_IOS_CLIENT_ID is missing in Config/Secrets.xcconfig. The steps are in docs/AUTH_SETUP.md."
+          }
+        }
+      }
+    },
     "Fecha": {
       "localizations": {
         "en": {
@@ -645,6 +655,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expenses by category"
+          }
+        }
+      }
+    },
+    "Google aún no está configurado": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google isn’t set up yet"
           }
         }
       }
@@ -887,16 +907,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next month"
-          }
-        }
-      }
-    },
-    "Modo": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mode"
           }
         }
       }
@@ -1440,6 +1450,16 @@
         }
       }
     },
+    "Sí, cerrar sesión": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, sign out"
+          }
+        }
+      }
+    },
     "Te debe %@": {
       "localizations": {
         "en": {
@@ -1562,6 +1582,16 @@
         }
       }
     },
+    "Tus datos quedan guardados en tu cuenta; vuelve a entrar cuando quieras.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your data stays saved in your account; sign back in anytime."
+          }
+        }
+      }
+    },
     "Tus gastos del día a día, en segundos.": {
       "localizations": {
         "en": {
@@ -1662,16 +1692,6 @@
         }
       }
     },
-    "¿Cerrar sesión?": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign out?"
-          }
-        }
-      }
-    },
     "¿Eliminar este gasto?": {
       "localizations": {
         "en": {
@@ -1708,6 +1728,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Who owes whom?"
+          }
+        }
+      }
+    },
+    "¿Seguro que quieres cerrar sesión?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to sign out?"
           }
         }
       }

@@ -39,7 +39,7 @@ struct CategoryChipsView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .foregroundStyle(isSelected ? .white : .primary)
-                .background(isSelected ? color : Color.secondary.opacity(0.12), in: Capsule())
+                .background(isSelected ? color : Theme.surfaceRaised, in: Capsule())
                 .overlay(Capsule().strokeBorder(color.opacity(isSelected ? 0 : 0.5), lineWidth: 1))
         }
         .buttonStyle(.plain)
@@ -54,7 +54,7 @@ struct CategoryChipsView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .overlay(Capsule().strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [4])))
-                .foregroundStyle(.tint)
+                .foregroundStyle(Theme.accent)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Nueva categoría")

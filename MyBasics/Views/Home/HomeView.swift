@@ -17,12 +17,14 @@ struct HomeView: View {
                     Section {
                         LoadErrorView(message: loadError) { await viewModel.load() }
                     }
+                    .themedRows()
                 } else if viewModel.isShowingSkeleton {
                     Section {
                         SkeletonRows()
                     } header: {
-                        Text("Cargando…")
+                        sectionHeader(Text("Cargando…"))
                     }
+                    .themedRows()
                 } else if viewModel.filteredExpenses.isEmpty {
                     emptyState
                 } else {
@@ -51,18 +53,18 @@ struct HomeView: View {
                                     .accessibilityAction(named: "Eliminar") { pendingDelete = expense }
                             }
                         } header: {
-                            HStack {
-                                Text(ExpenseAnalytics.dayTitle(for: section.day))
-                                Spacer()
-                                Text(CurrencyFormatter.string(fromCents: section.totalCents, currency: currency))
-                                    .monospacedDigit()
-                            }
+                            sectionHeader(
+                                Text(ExpenseAnalytics.dayTitle(for: section.day)),
+                                trailing: CurrencyFormatter.string(fromCents: section.totalCents, currency: currency))
                         }
+                        .themedRows()
                     }
                 }
             }
             .listStyle(.insetGrouped)
-            .contentMargins(.top, 8, for: .scrollContent)
+            .listSectionSpacing(14)
+            .contentMargins(.top, 4, for: .scrollContent)
+            .themedScreen()
             .toolbar(.hidden, for: .navigationBar)
             .task(id: viewModel.month) { await viewModel.load() }
             .refreshable { await viewModel.load() }
@@ -70,10 +72,9 @@ struct HomeView: View {
             .sensoryFeedback(.impact(weight: .medium), trigger: viewModel.deletedFeedback)
             .sensoryFeedback(.error, trigger: viewModel.errorFeedback)
             .sensoryFeedback(.selection, trigger: viewModel.selectedCategoryId)
-            .confirmationDialog(
+            .alert(
                 "¿Eliminar este gasto?",
                 isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-                titleVisibility: .visible,
                 presenting: pendingDelete
             ) { expense in
                 Button("Eliminar", role: .destructive) {
@@ -91,7 +92,7 @@ struct HomeView: View {
 
     private var summarySection: some View {
         Section {
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 MonthNavigator(
                     title: viewModel.monthTitle,
                     canGoForward: viewModel.canGoToNextMonth,
@@ -101,13 +102,14 @@ struct HomeView: View {
 
                 statusLine
 
-                Picker("Tipo de gasto", selection: Binding(
-                    get: { viewModel.filter },
-                    set: { newValue in Motion.animate { viewModel.filter = newValue } }
-                )) {
-                    ForEach(KindFilter.allCases) { Text($0.displayName).tag($0) }
-                }
-                .pickerStyle(.segmented)
+                VStack(spacing: 16) {
+                PillPicker(
+                    options: KindFilter.allCases,
+                    selection: Binding(
+                        get: { viewModel.filter },
+                        set: { newValue in Motion.animate { viewModel.filter = newValue } }),
+                    title: \.displayName)
+                    .accessibilityLabel("Tipo de gasto")
 
                 if viewModel.isShowingSkeleton {
                     ProgressView()
@@ -132,9 +134,26 @@ struct HomeView: View {
                         onSelect: viewModel.toggleSelection
                     )
                 }
+                }
+                .card()
             }
-            .padding(.vertical, 8)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 4, trailing: 0))
+            .listRowBackground(Color.clear)
         }
+    }
+
+    /// Encabezado de sección: texto pequeño y, opcional, un monto a la derecha.
+    private func sectionHeader(_ title: Text, trailing: String? = nil) -> some View {
+        HStack {
+            title
+            Spacer()
+            if let trailing {
+                Text(trailing).font(Theme.amount(.footnote, weight: .semibold))
+            }
+        }
+        .font(.footnote.weight(.semibold))
+        .foregroundStyle(Theme.textSecondary)
+        .textCase(nil)
     }
 
     /// "Actualizando…" mientras se refresca la caché, o un aviso si se está sin conexión.
@@ -149,7 +168,7 @@ struct HomeView: View {
                 }
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Theme.textSecondary)
             .transition(.opacity)
         } else if hasMixedCurrencies {
             Label("Este mes tiene gastos en varias monedas; los totales no las convierten.",
@@ -167,12 +186,12 @@ struct HomeView: View {
     private var emptyDonut: some View {
         ZStack {
             Circle()
-                .stroke(Color.secondary.opacity(0.15), lineWidth: 36)
+                .stroke(Theme.surfaceRaised, lineWidth: 36)
                 .padding(18)
             VStack(spacing: 2) {
-                Text("Total").font(.subheadline).foregroundStyle(.secondary)
+                Text("Total").font(.subheadline).foregroundStyle(Theme.textSecondary)
                 Text(CurrencyFormatter.string(fromCents: 0, currency: currency))
-                    .font(.title2.weight(.bold))
+                    .font(Theme.amount(.title2))
             }
         }
         .frame(height: 240)
@@ -188,8 +207,10 @@ struct HomeView: View {
             } actions: {
                 Button("Agregar gasto", action: onAdd)
                     .buttonStyle(.borderedProminent)
+                    .foregroundStyle(.black)
             }
         }
+        .themedRows()
     }
 
     private var emptyTitle: String {

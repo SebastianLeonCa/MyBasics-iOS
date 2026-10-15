@@ -11,9 +11,8 @@ struct RootView: View {
         Group {
             switch env.sessionState {
             case .loading:
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                    .overlay { ProgressView() }
+                ThemedBackground()
+                    .overlay { ProgressView().tint(Theme.accent) }
             case .signedOut:
                 LoginView(environment: env)
                     .transition(.opacity)
@@ -32,6 +31,8 @@ struct RootView: View {
             NewPasswordView()
         }
         .errorAlert($env.linkMessage)
+        .tint(Theme.accent)
+        .preferredColorScheme(.dark)
         .onAppear { Motion.isReduced = reduceMotion }
         .onChange(of: reduceMotion) { _, value in Motion.isReduced = value }
     }

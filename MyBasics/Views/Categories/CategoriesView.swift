@@ -10,26 +10,30 @@ struct CategoriesView: View {
 
     var body: some View {
         List {
-            if let loadError = viewModel.loadError {
-                LoadErrorView(message: loadError) { await viewModel.load() }
-            } else if !viewModel.hasLoaded {
-                SkeletonRows(count: 4)
-            }
-            ForEach(viewModel.categories) { category in
-                HStack(spacing: 12) {
-                    CategoryIcon(category: category, size: 32)
-                    Text(verbatim: category.displayName)
-                    Spacer()
-                    if category.isDefault {
-                        Text("Por defecto")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+            Group {
+                if let loadError = viewModel.loadError {
+                    LoadErrorView(message: loadError) { await viewModel.load() }
+                } else if !viewModel.hasLoaded {
+                    SkeletonRows(count: 4)
                 }
-                .accessibilityElement(children: .combine)
+                ForEach(viewModel.categories) { category in
+                    HStack(spacing: 12) {
+                        CategoryIcon(category: category, size: 32)
+                        Text(verbatim: category.displayName)
+                        Spacer()
+                        if category.isDefault {
+                            Text("Por defecto")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .accessibilityElement(children: .combine)
+                }
             }
+            .themedRows()
         }
         .navigationTitle("Categorías")
+        .themedScreen()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
