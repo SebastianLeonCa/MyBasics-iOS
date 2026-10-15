@@ -17,14 +17,14 @@ struct ExpenseRow: View {
                 Text(expense.displayTitle)
                     .font(.body.weight(.medium))
                     .lineLimit(1)
-                HStack(spacing: 6) {
-                    KindBadge(kind: expense.kind)
-                    if let status = sharedStatus {
-                        Label(status.text, systemImage: status.icon)
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(status.color)
-                            .lineLimit(1)
-                    }
+                KindBadge(kind: expense.kind)
+                // En su propia línea para que no se corte.
+                if let status = sharedStatus {
+                    Label(status.text, systemImage: status.icon)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(status.color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                 }
             }
 
@@ -52,7 +52,7 @@ struct ExpenseRow: View {
         let color: Color
     }
 
-    /// Pendiente primero (es lo accionable); si no, lo que ya te devolvieron.
+    /// Solo lo pendiente (es lo accionable). Lo que ya te devolvieron se nota en el monto tachado.
     private var sharedStatus: SharedStatus? {
         if let debt = expense.debts.first(where: { !$0.isSettled }) {
             return debt.direction == .theyOweMe
@@ -62,11 +62,6 @@ struct ExpenseRow: View {
                 : SharedStatus(
                     text: String(localized: "Le debes a \(debt.counterpartyName)"),
                     icon: "arrow.up.right", color: Theme.negative)
-        }
-        if let paid = expense.debts.first(where: { $0.isSettled && $0.direction == .theyOweMe }) {
-            return SharedStatus(
-                text: String(localized: "\(paid.counterpartyName) te pagó \(money(paid.amountCents))"),
-                icon: "checkmark.circle", color: Theme.textSecondary)
         }
         return nil
     }

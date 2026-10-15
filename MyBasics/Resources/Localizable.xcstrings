@@ -11,16 +11,6 @@
         }
       }
     },
-    "%@ te pagó %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%1$@ paid you %2$@"
-          }
-        }
-      }
-    },
     "%@ · %@": {
       "shouldTranslate": false
     },
@@ -475,6 +465,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Change the language in iOS Settings › MyBasics › Language. Sample data lives in memory and resets when you close the app. Fill in Config/Secrets.xcconfig to use Supabase."
+          }
+        }
+      }
+    },
+    "El monto de arriba es el total que pagaste. Cuando te pague, en tus gastos contará solo tu parte.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The amount above is the total you paid. Once they pay you back, only your share counts in your spending."
           }
         }
       }
@@ -1225,16 +1225,6 @@
         }
       }
     },
-    "Pagaste %@. Cuando te pague, tu gasto quedará en %@.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You paid %1$@. Once they pay you back, this expense will count as %2$@."
-          }
-        }
-      }
-    },
     "Persona": {
       "localizations": {
         "en": {
@@ -1632,6 +1622,16 @@
         }
       }
     },
+    "Tu parte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your share"
+          }
+        }
+      }
+    },
     "Tu sesión expiró. Vuelve a iniciar sesión.": {
       "localizations": {
         "en": {
@@ -1718,6 +1718,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "You can now use it to sign in."
+          }
+        }
+      }
+    },
+    "Ya te pagó": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paid you back"
           }
         }
       }
