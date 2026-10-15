@@ -27,7 +27,9 @@ create table if not exists public.categories (
 create table if not exists public.expenses (
     id           uuid primary key default gen_random_uuid(),
     user_id      uuid not null default auth.uid() references auth.users (id) on delete cascade,
-    category_id  uuid not null references public.categories (id) on delete restrict,
+    -- NO ACTION (no RESTRICT): se verifica al final de la sentencia, así borrar un usuario
+    -- elimina en cascada sus categorías y gastos sin chocar entre sí.
+    category_id  uuid not null references public.categories (id) on delete no action,
     amount_cents integer not null check (amount_cents > 0),
     currency     text not null default 'USD' check (currency ~ '^[A-Z]{3}$'),
     kind         text not null default 'variable' check (kind in ('fixed', 'variable')),
@@ -48,6 +50,12 @@ create table if not exists public.debts (
     settled_at        timestamptz,
     created_at        timestamptz not null default now()
 );
+
+
+-- Migración (Fase 4): proyectos creados con la versión anterior tenían ON DELETE RESTRICT.
+alter table public.expenses drop constraint if exists expenses_category_id_fkey;
+alter table public.expenses add constraint expenses_category_id_fkey
+    foreign key (category_id) references public.categories (id) on delete no action;
 
 
 -- -----------------------------------------------------------------------------
@@ -198,6 +206,32 @@ $$;
 
 revoke execute on function public.save_expense(jsonb, jsonb) from public, anon;
 grant execute on function public.save_expense(jsonb, jsonb) to authenticated;
+
+
+-- -----------------------------------------------------------------------------
+-- delete_my_account: el usuario elimina su propia cuenta (requisito de App Store).
+-- Borra la fila de auth.users; categorías, gastos y compartidos se van en cascada.
+-- SECURITY DEFINER porque un usuario normal no puede tocar auth.users; solo borra auth.uid().
+-- -----------------------------------------------------------------------------
+
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+    v_uid uuid := auth.uid();
+begin
+    if v_uid is null then
+        raise exception 'No autenticado' using errcode = '42501';
+    end if;
+    delete from auth.users where id = v_uid;
+end;
+$$;
+
+revoke execute on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
 
 
 -- -----------------------------------------------------------------------------
