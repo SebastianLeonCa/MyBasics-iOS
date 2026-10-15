@@ -27,7 +27,10 @@ Tiempo estimado: 10 minutos. Todo en el plan gratuito.
 4. Comprueba en **Table Editor** que existen `categories`, `expenses` y `debts`, y que las tres muestran
    el candado de **RLS enabled**.
 
-## 3. Crear el usuario de prueba
+## 3. Crear un usuario de prueba
+
+> Desde la Fase 4 la app tiene login real (ver [AUTH_SETUP.md](AUTH_SETUP.md)); este usuario sirve
+> para entrar con el formulario de email sin esperar correos de confirmación.
 
 1. Ve a **Authentication › Users** y pulsa **Add user › Create new user**.
 2. Escribe un email (puede ser inventado, p. ej. `dev@mybasics.test`) y una contraseña.
@@ -50,20 +53,20 @@ Tiempo estimado: 10 minutos. Todo en el plan gratuito.
    cp Config/Secrets.example.xcconfig Config/Secrets.xcconfig   # solo si aún no existe
    open -e Config/Secrets.xcconfig
    ```
-3. Completa los cuatro valores. **Ojo con la URL:** en `.xcconfig` el `//` es un comentario, por eso va `https:/$()/`:
+3. Completa los valores. **Ojo con la URL:** en `.xcconfig` el `//` es un comentario, por eso va `https:/$()/`:
    ```
    SUPABASE_URL = https:/$()/abcdefghijkl.supabase.co
    SUPABASE_ANON_KEY = sb_publishable_xxxxxxxxxxxxxxxx
-   DEV_USER_EMAIL = dev@mybasics.test
-   DEV_USER_PASSWORD = la-contraseña-del-paso-3
+   GOOGLE_IOS_CLIENT_ID =
    ```
+   (`GOOGLE_IOS_CLIENT_ID` se completa en la Fase 4; vacío oculta el botón de Google.)
    Este archivo está en `.gitignore`: no se sube a GitHub (`git status` no debe mostrarlo).
 
 ## 5. Probar
 
 1. En Xcode: **Product › Clean Build Folder** (⇧⌘K) y luego **Run** (⌘R).
-2. La app muestra *Conectando…* un instante y luego Inicio vacío (tu base de datos está vacía).
-   En **Ajustes › Datos** debe decir **Supabase**.
+2. La app muestra el login: entra con el email y la contraseña del paso 3. Inicio aparece vacío
+   (tu base de datos está vacía). En **Ajustes › Datos** debe decir **Supabase**.
 3. Toca **+**, registra un gasto y guárdalo.
 4. En Supabase › **Table Editor › expenses** pulsa *Refresh*: ahí está la fila.
    Si lo marcaste como compartido, también aparece en **debts**.
@@ -74,7 +77,7 @@ Tiempo estimado: 10 minutos. Todo en el plan gratuito.
 | Mensaje en la app | Causa probable |
 | --- | --- |
 | *No se pudo conectar con el servidor. Revisa SUPABASE_URL.* | URL mal escrita, o falta el `$()` en `https:/$()/`. |
-| *No se pudo iniciar sesión con el usuario de prueba…* | Email/contraseña distintos a los del paso 3, o el usuario no está confirmado. |
+| *Email o contraseña incorrectos* | Email/contraseña distintos a los del paso 3, o el usuario no está confirmado (*Auto Confirm User*). |
 | *La base de datos no está configurada…* | No se ejecutó `schema.sql` (o se ejecutó en otro proyecto). |
 | *Ajustes › Datos* dice *Ejemplo* | `Secrets.xcconfig` aún tiene placeholders (`TU_…`). Corrige y haz Clean Build. |
 | Todo funcionaba y de pronto no conecta | Los proyectos gratis se **pausan tras 7 días sin uso**. Reactívalo desde el dashboard. |
