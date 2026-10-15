@@ -127,15 +127,22 @@ struct AddExpenseView: View {
                     .textContentType(.name)
                     .focused($focusedField, equals: .debtPerson)
 
-                // "Me debe": cuánto de lo que pagaste te van a devolver.
+                // "Me debe": cuánto de lo que pagaste te van a devolver, y tu parte.
                 // "Le debo": no se pide: debes el gasto completo (tu parte).
                 if viewModel.debtDirection == .theyOweMe {
                     HStack(spacing: 4) {
                         Text("Te debe")
+                        if viewModel.isDebtSettled {
+                            Label("Ya te pagó", systemImage: "checkmark.circle.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Theme.positive)
+                                .padding(.leading, 6)
+                        }
                         Spacer()
                         Text(CurrencyFormatter.symbol(for: viewModel.currency))
                             .foregroundStyle(Theme.textSecondary)
-                        TextField(amountPlaceholder, text: Binding(
+                        // Vacío muestra la mitad en gris (sugerencia); lo que escribas queda fijo.
+                        TextField(debtPlaceholder, text: Binding(
                             get: { viewModel.debtAmountText },
                             set: { viewModel.setDebtAmountText($0) }
                         ))
@@ -146,6 +153,15 @@ struct AddExpenseView: View {
                         .accessibilityLabel("Monto que te debe")
                     }
                     .transition(.opacity)
+
+                    if let share = viewModel.netAfterReimbursementCents {
+                        LabeledContent("Tu parte") {
+                            Text(CurrencyFormatter.string(fromCents: share, currency: viewModel.currency))
+                                .font(Theme.amount(.body, weight: .semibold))
+                                .foregroundStyle(Theme.accent)
+                        }
+                        .transition(.opacity)
+                    }
                 }
             } label: {
                 Label("Compartido con alguien", systemImage: "person.2")
@@ -165,12 +181,16 @@ struct AddExpenseView: View {
     private var debtExplanation: some View {
         switch viewModel.debtDirection {
         case .theyOweMe:
-            if let net = viewModel.netAfterReimbursementCents, let amount = viewModel.amountCents {
-                Text("Pagaste \(CurrencyFormatter.string(fromCents: amount, currency: viewModel.currency)). Cuando te pague, tu gasto quedará en \(CurrencyFormatter.string(fromCents: net, currency: viewModel.currency)).")
-            }
+            Text("El monto de arriba es el total que pagaste. Cuando te pague, en tus gastos contará solo tu parte.")
         case .iOweThem:
             Text("Registra solo tu parte: ese monto es lo que debes. Al marcarlo como pagado, el gasto se mantiene y sale de lo que debes.")
         }
+    }
+
+    /// La sugerencia (la mitad del total) como texto gris del campo.
+    private var debtPlaceholder: String {
+        viewModel.suggestedDebtCents.map { CurrencyFormatter.inputString(fromCents: $0, currency: viewModel.currency) }
+            ?? amountPlaceholder
     }
 
     /// "0.00" o "0,00" según el dispositivo ("0" si la moneda no usa decimales).

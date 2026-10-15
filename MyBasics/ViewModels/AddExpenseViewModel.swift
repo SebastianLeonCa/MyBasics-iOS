@@ -20,15 +20,13 @@ final class AddExpenseViewModel {
     var spentAt = Date.now
 
     // Gasto compartido (sección plegable: abierta = alguien me debe o yo le debo una parte)
-    var hasDebt = false {
-        didSet { if hasDebt { syncDebtAmountIfNeeded() } }
-    }
+    var hasDebt = false
     var debtPerson = ""
     /// Solo se usa con "Me debe": cuánto de lo que pagaste te van a devolver.
+    /// Vacío = se usa la sugerencia (la mitad), que se ve en gris. Lo que escribas queda fijo:
+    /// cambiar el total después no lo modifica.
     private(set) var debtAmountText = ""
     var debtDirection: DebtDirection = .theyOweMe
-    /// Si el usuario tocó el monto compartido, deja de seguir "la mitad del gasto".
-    private var debtAmountEdited = false
 
     private(set) var isLoadingCategories = false
     /// Error al cargar las categorías (se muestra en la fila de chips con "Reintentar").
@@ -55,7 +53,6 @@ final class AddExpenseViewModel {
                 debtPerson = debt.counterpartyName
                 debtAmountText = CurrencyFormatter.inputString(fromCents: debt.amountCents, currency: self.currency)
                 debtDirection = debt.direction
-                debtAmountEdited = true
             }
         }
     }
@@ -68,16 +65,30 @@ final class AddExpenseViewModel {
     var selectedCategory: Category? { categories.first { $0.id == categoryId } }
 
     var amountCents: Int? { CurrencyFormatter.cents(fromInput: amountText, currency: currency) }
-    /// "Me debe": el monto que escribiste (por defecto, la mitad).
+    /// Sugerencia para "Me debe": la mitad del total (redondeada a lo que se puede escribir).
+    var suggestedDebtCents: Int? {
+        amountCents.map { CurrencyFormatter.roundedToInputable($0 / 2, currency: currency) }
+    }
+
+    /// true si el monto de "Me debe" es la sugerencia (nadie escribió uno).
+    var isUsingSuggestedDebt: Bool { debtAmountText.isEmpty }
+
+    /// Si este compartido ya estaba marcado como pagado (al editar).
+    var isDebtSettled: Bool { editingExpense?.debts.first?.isSettled == true }
+
+    /// "Me debe": el monto que escribiste, o la sugerencia (la mitad) si lo dejaste vacío.
     /// "Le debo": el gasto completo. Registras solo tu parte y eso es lo que debes; no se pide otro monto.
     var debtAmountCents: Int? {
         switch debtDirection {
-        case .theyOweMe: CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency)
+        case .theyOweMe:
+            debtAmountText.isEmpty
+                ? suggestedDebtCents
+                : CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency)
         case .iOweThem: amountCents
         }
     }
 
-    /// Con "Me debe": lo que te costará el gasto una vez que te paguen.
+    /// Con "Me debe": tu parte, lo que te cuesta el gasto una vez que te paguen (total − lo que te deben).
     var netAfterReimbursementCents: Int? {
         guard debtDirection == .theyOweMe, let amount = amountCents, let debt = debtAmountCents else { return nil }
         return max(amount - debt, 0)
@@ -97,12 +108,10 @@ final class AddExpenseViewModel {
 
     func setAmountText(_ text: String) {
         amountText = CurrencyFormatter.sanitizeInput(text, currency: currency)
-        syncDebtAmountIfNeeded()
     }
 
     func setDebtAmountText(_ text: String) {
         debtAmountText = CurrencyFormatter.sanitizeInput(text, currency: currency)
-        debtAmountEdited = true
     }
 
     func loadCategories() async {
@@ -150,14 +159,5 @@ final class AddExpenseViewModel {
             category: categories.first { $0.id == categoryId } ?? editingExpense?.category,
             debts: debts
         )
-    }
-
-    private func syncDebtAmountIfNeeded() {
-        guard !debtAmountEdited else { return }
-        debtAmountText = amountCents.map {
-            CurrencyFormatter.inputString(
-                fromCents: CurrencyFormatter.roundedToInputable($0 / 2, currency: currency),
-                currency: currency)
-        } ?? ""
     }
 }
