@@ -9,10 +9,11 @@ final class AppEnvironment {
         case mock, supabase
     }
 
-    enum SessionState {
-        case signingIn
-        case ready
-        case failed(String)
+    enum SessionState: Equatable {
+        /// Leyendo la sesión guardada (un instante al abrir la app).
+        case loading
+        case signedOut
+        case signedIn(UUID)
     }
 
     let expenseRepository: any ExpenseRepository
@@ -21,8 +22,16 @@ final class AppEnvironment {
     let dataSource: DataSource
     /// Caché local del mes en curso (nil = sin caché, p. ej. en modo de ejemplo).
     let expenseCache: (any ExpenseCache)?
-    private(set) var sessionState: SessionState = .signingIn
+    /// Client ID de Google (tipo iOS). nil = se oculta "Continuar con Google".
+    let googleIOSClientID: String?
 
+    private(set) var sessionState: SessionState = .loading
+    /// Se abrió un enlace de "olvidé mi contraseña": hay que pedir la nueva.
+    var isRecoveringPassword = false
+    /// Mensaje tras abrir un enlace de confirmación (p. ej. "Correo confirmado").
+    var linkMessage: UserFacingError?
+
+    private var eventsTask: Task<Void, Never>?
     private let defaults: UserDefaults
     private static let currencyKey = "currency"
 
@@ -37,6 +46,7 @@ final class AppEnvironment {
         authService: any AuthService,
         dataSource: DataSource,
         expenseCache: (any ExpenseCache)? = nil,
+        googleIOSClientID: String? = nil,
         defaults: UserDefaults = .standard
     ) {
         self.expenseRepository = expenseRepository
@@ -44,6 +54,7 @@ final class AppEnvironment {
         self.authService = authService
         self.dataSource = dataSource
         self.expenseCache = expenseCache
+        self.googleIOSClientID = googleIOSClientID
         self.defaults = defaults
         self.currency = defaults.string(forKey: Self.currencyKey) ?? CurrencyFormatter.defaultCurrency
     }
@@ -55,7 +66,8 @@ final class AppEnvironment {
         if !isRunningTests, !forceMock, let config = SupabaseConfig.fromBundle() {
             return supabase(config)
         }
-        return mock()
+        let signedOut = ProcessInfo.processInfo.arguments.contains("-mockSignedOut")
+        return mock(signedIn: !signedOut)
     }
 
     static func supabase(_ config: SupabaseConfig) -> AppEnvironment {
@@ -63,42 +75,92 @@ final class AppEnvironment {
         return AppEnvironment(
             expenseRepository: SupabaseExpenseRepository(client: client),
             categoryRepository: SupabaseCategoryRepository(client: client),
-            authService: DevUserAuthService(client: client, email: config.devUserEmail, password: config.devUserPassword),
+            authService: SupabaseAuthService(client: client),
             dataSource: .supabase,
-            expenseCache: FileExpenseCache()
+            expenseCache: FileExpenseCache(),
+            googleIOSClientID: config.googleIOSClientID
         )
     }
 
     /// Todo en memoria, sin red.
     /// `withSampleData: false` arranca vacío (útil para ver el estado vacío).
-    static func mock(withSampleData: Bool = true, defaults: UserDefaults = .standard) -> AppEnvironment {
+    static func mock(
+        withSampleData: Bool = true,
+        signedIn: Bool = true,
+        defaults: UserDefaults = .standard
+    ) -> AppEnvironment {
         let categories = MockCategoryRepository()
         let expenses = withSampleData ? MockData.expenses(categories: categories.categories) : []
         return AppEnvironment(
             expenseRepository: MockExpenseRepository(expenses: expenses, categories: { categories.categories }),
             categoryRepository: categories,
-            authService: MockAuthService(),
+            authService: MockAuthService(signedIn: signedIn),
             dataSource: .mock,
             defaults: defaults
         )
     }
 
-    /// Inicia sesión (en silencio). Se llama al abrir la app y desde "Reintentar".
+    // MARK: - Sesión
+
+    /// Al abrir la app: recupera la sesión del Keychain y empieza a escuchar cambios.
     func start() async {
-        if case .ready = sessionState, authService.isSignedIn { return }
-        // Abrir rápido: con una sesión guardada se entra de inmediato (Inicio muestra la caché)
-        // y la sesión se renueva en segundo plano. Si la renovación falla, las consultas lo avisan.
-        if authService.isSignedIn {
-            sessionState = .ready
-            try? await authService.signIn()
-            return
+        if eventsTask == nil {
+            let stream = authService.events()
+            eventsTask = Task { [weak self] in
+                for await event in stream { self?.apply(event) }
+            }
         }
-        sessionState = .signingIn
+        if sessionState == .loading {
+            sessionState = await authService.restoreSession().map { .signedIn($0) } ?? .signedOut
+        }
+    }
+
+    private func apply(_ event: AuthEvent) {
+        switch event {
+        case .signedIn(let id):
+            if sessionState != .signedIn(id) { sessionState = .signedIn(id) }
+        case .signedOut:
+            expenseCache?.removeAll()
+            isRecoveringPassword = false
+            sessionState = .signedOut
+        }
+    }
+
+    /// Para los inicios de sesión que no pasan por el flujo de eventos (o por si llega tarde).
+    func syncSession() {
+        sessionState = authService.currentUserId.map { .signedIn($0) } ?? .signedOut
+    }
+
+    func signOut() async throws {
+        try await authService.signOut()
+        expenseCache?.removeAll()
+        syncSession()
+    }
+
+    func deleteAccount() async throws {
+        try await authService.deleteAccount()
+        expenseCache?.removeAll()
+        syncSession()
+    }
+
+    /// Enlace mybasics://… abierto desde el correo.
+    func handleOpenURL(_ url: URL) async {
         do {
-            try await authService.signIn()
-            sessionState = .ready
+            switch try await authService.handle(url) {
+            case .passwordRecovery:
+                syncSession()
+                isRecoveringPassword = true
+            case .emailConfirmed:
+                syncSession()
+                linkMessage = UserFacingError(
+                    title: String(localized: "Correo confirmado"),
+                    message: String(localized: "¡Listo! Tu cuenta está activa."))
+            case nil:
+                break
+            }
         } catch {
-            sessionState = .failed(UserFacingError.describe(error))
+            linkMessage = UserFacingError(
+                error, title: String(localized: "El enlace no es válido o ya expiró"))
         }
     }
 }

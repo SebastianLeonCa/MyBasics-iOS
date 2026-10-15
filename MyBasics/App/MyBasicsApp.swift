@@ -6,7 +6,7 @@ struct MyBasicsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(environment: environment)
+            RootView()
                 .environment(environment)
         }
     }

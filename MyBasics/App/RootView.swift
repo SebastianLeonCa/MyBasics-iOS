@@ -1,12 +1,48 @@
 import SwiftUI
 
-/// Contenedor principal: pestañas personalizadas + hoja de nuevo/editar gasto.
+/// Raíz: según la sesión muestra Login o la app. Al cambiar de usuario, la app se recrea
+/// (`.id(userId)`), así no quedan datos de la cuenta anterior en memoria.
 struct RootView: View {
+    @Environment(AppEnvironment.self) private var env
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        @Bindable var env = env
+        Group {
+            switch env.sessionState {
+            case .loading:
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
+                    .overlay { ProgressView() }
+            case .signedOut:
+                LoginView(environment: env)
+                    .transition(.opacity)
+            case .signedIn(let userId):
+                SignedInView(environment: env)
+                    .id(userId)
+                    .transition(.opacity)
+            }
+        }
+        .animation(Motion.isReduced ? nil : .smooth, value: env.sessionState)
+        .task { await env.start() }
+        .onOpenURL { url in
+            Task { await env.handleOpenURL(url) }
+        }
+        .sheet(isPresented: $env.isRecoveringPassword) {
+            NewPasswordView()
+        }
+        .errorAlert($env.linkMessage)
+        .onAppear { Motion.isReduced = reduceMotion }
+        .onChange(of: reduceMotion) { _, value in Motion.isReduced = value }
+    }
+}
+
+/// La app con sesión iniciada: pestañas personalizadas + hoja de nuevo/editar gasto.
+struct SignedInView: View {
     @Environment(AppEnvironment.self) private var env
     @State private var homeViewModel: HomeViewModel
     @State private var tab: AppTab = .home
     @State private var editor: ExpenseEditorRoute?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(environment: AppEnvironment) {
         let auth = environment.authService
@@ -17,33 +53,6 @@ struct RootView: View {
     }
 
     var body: some View {
-        sessionContent
-            .onAppear { Motion.isReduced = reduceMotion }
-            .onChange(of: reduceMotion) { _, value in Motion.isReduced = value }
-    }
-
-    @ViewBuilder
-    private var sessionContent: some View {
-        switch env.sessionState {
-        case .ready:
-            content
-        case .signingIn:
-            ProgressView("Conectando…")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .task { await env.start() }
-        case .failed(let message):
-            ContentUnavailableView {
-                Label("No se pudo conectar", systemImage: "icloud.slash")
-            } description: {
-                Text(message)
-            } actions: {
-                Button("Reintentar") { Task { await env.start() } }
-                    .buttonStyle(.borderedProminent)
-            }
-        }
-    }
-
-    private var content: some View {
         Group {
             switch tab {
             case .home:
