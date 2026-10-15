@@ -31,7 +31,7 @@ create table if not exists public.expenses (
     -- elimina en cascada sus categorías y gastos sin chocar entre sí.
     category_id  uuid not null references public.categories (id) on delete no action,
     amount_cents integer not null check (amount_cents > 0),
-    -- Sin moneda por gasto: la moneda es una sola, la del perfil (profiles.currency).
+    -- Sin moneda por gasto: la app usa una sola moneda fija (USD).
     kind         text not null default 'variable' check (kind in ('fixed', 'variable')),
     note         text check (note is null or char_length(note) <= 200),
     spent_at     timestamptz not null default now(),
@@ -52,33 +52,11 @@ create table if not exists public.debts (
 );
 
 
--- Perfil: una fila por usuario. Única fuente de verdad de la moneda con la que se muestran
--- todos los montos (es solo el símbolo: los montos nunca se convierten).
-create table if not exists public.profiles (
-    user_id    uuid primary key default auth.uid() references auth.users (id) on delete cascade,
-    currency   text not null default 'USD' check (currency ~ '^[A-Z]{3}$'),
-    updated_at timestamptz not null default now()
-);
-
--- Migración: antes cada gasto guardaba su moneda. Se pasa al perfil la del gasto más reciente
--- de cada usuario y se elimina la columna, para que no haya dos fuentes de verdad.
-do $$
-begin
-    if exists (
-        select 1 from information_schema.columns
-        where table_schema = 'public' and table_name = 'expenses' and column_name = 'currency'
-    ) then
-        execute $sql$
-            insert into public.profiles (user_id, currency)
-            select distinct on (user_id) user_id, currency
-            from public.expenses
-            order by user_id, spent_at desc
-            on conflict (user_id) do nothing
-        $sql$;
-        alter table public.expenses drop column currency;
-    end if;
-end;
-$$;
+-- Migración: la moneda es fija en la app (USD, "$"). Antes cada gasto guardaba la suya y
+-- hubo una versión con tabla profiles; se eliminan ambas para que no haya otra fuente de verdad.
+-- Los montos no cambian.
+alter table public.expenses drop column if exists currency;
+drop table if exists public.profiles;
 
 -- Migración (Fase 4): proyectos creados con la versión anterior tenían ON DELETE RESTRICT.
 alter table public.expenses drop constraint if exists expenses_category_id_fkey;
@@ -104,18 +82,6 @@ create index if not exists debts_user_pending_idx     on public.debts (user_id) 
 alter table public.categories enable row level security;
 alter table public.expenses   enable row level security;
 alter table public.debts      enable row level security;
-alter table public.profiles   enable row level security;
-
--- profiles (sin DELETE: se borra en cascada al eliminar la cuenta)
-drop policy if exists "own rows: select" on public.profiles;
-drop policy if exists "own rows: insert" on public.profiles;
-drop policy if exists "own rows: update" on public.profiles;
-create policy "own rows: select" on public.profiles for select to authenticated
-    using ((select auth.uid()) = user_id);
-create policy "own rows: insert" on public.profiles for insert to authenticated
-    with check ((select auth.uid()) = user_id);
-create policy "own rows: update" on public.profiles for update to authenticated
-    using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
 -- categories
 drop policy if exists "own rows: select" on public.categories;
@@ -309,7 +275,6 @@ set search_path = ''
 as $$
 begin
     perform public.seed_default_categories(new.id);
-    insert into public.profiles (user_id) values (new.id) on conflict (user_id) do nothing;
     return new;
 end;
 $$;
@@ -323,4 +288,3 @@ create trigger on_auth_user_created
 
 -- Usuarios que ya existían antes de correr este script también reciben sus categorías.
 select public.seed_default_categories(id) from auth.users;
-insert into public.profiles (user_id) select id from auth.users on conflict (user_id) do nothing;
