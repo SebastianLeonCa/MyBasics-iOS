@@ -29,7 +29,7 @@ final class SupabaseCodingTests: XCTestCase {
 
     func testSaveExpenseParamsMatchSqlFunction() throws {
         var expense = Expense(
-            categoryId: UUID(), amountCents: 6_400, currency: "USD", kind: .fixed, note: "Cena",
+            categoryId: UUID(), amountCents: 6_400, kind: .fixed, note: "Cena",
             spentAt: Date(timeIntervalSince1970: 1_791_991_920.5))
         expense.debts = [Debt(counterpartyName: "Juan", amountCents: 3_200, direction: .iOweThem)]
 
@@ -43,6 +43,7 @@ final class SupabaseCodingTests: XCTestCase {
         XCTAssertEqual(p["kind"] as? String, "fixed")
         XCTAssertEqual(p["spent_at"] as? String, "2026-10-14T15:32:00.500Z")
         XCTAssertNil(p["category"], "la categoría embebida no se envía")
+        XCTAssertNil(p["currency"], "la moneda vive solo en el perfil")
         XCTAssertEqual(debts.first?["direction"] as? String, "i_owe_them")
         XCTAssertEqual(debts.first?["is_settled"] as? Bool, false)
     }

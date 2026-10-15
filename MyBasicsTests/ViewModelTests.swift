@@ -232,7 +232,7 @@ final class MockDataTests: XCTestCase {
 
         XCTAssertTrue((38...45).contains(expenses.count), "~40 gastos, hay \(expenses.count)")
         XCTAssertEqual(Set(expenses.map { $0.spentAt.startOfMonth() }).count, 3)
-        XCTAssertTrue(expenses.allSatisfy { $0.spentAt <= now && $0.amountCents > 0 && $0.currency == "USD" })
+        XCTAssertTrue(expenses.allSatisfy { $0.spentAt <= now && $0.amountCents > 0 })
         XCTAssertGreaterThan(expenses.filter(\.hasPendingDebt).count, 2)
     }
 }

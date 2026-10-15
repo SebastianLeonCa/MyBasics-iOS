@@ -10,7 +10,7 @@ final class CSVExporterTests: XCTestCase {
         dinner.debts = [Debt(counterpartyName: "Juan", amountCents: 2_525, direction: .theyOweMe)]
         let rent = F.expense(F.home, units: 1_200, kind: .fixed, at: F.date(2026, 10, 1, 9), note: "Arriendo")
 
-        let lines = CSVExporter.csv(for: [dinner, rent], calendar: F.calendar)
+        let lines = CSVExporter.csv(for: [dinner, rent], currency: "USD", calendar: F.calendar)
             .components(separatedBy: "\r\n").filter { !$0.isEmpty }
 
         XCTAssertEqual(lines.count, 3)
@@ -31,10 +31,12 @@ final class CSVExporterTests: XCTestCase {
 
     func testWritesUtf8FileWithBom() throws {
         let url = try CSVExporter.writeFile(
-            for: [F.expense(F.food, units: 3, at: F.date(2026, 10, 2), note: "Café")], month: F.date(2026, 10, 1))
+            for: [F.expense(F.food, units: 3, at: F.date(2026, 10, 2), note: "Café")], month: F.date(2026, 10, 1),
+            currency: "PEN")
         let data = try Data(contentsOf: url)
         XCTAssertEqual(Array(data.prefix(3)), [0xEF, 0xBB, 0xBF])
         XCTAssertTrue(String(decoding: data, as: UTF8.self).contains("Café"))
+        XCTAssertTrue(String(decoding: data, as: UTF8.self).contains(",PEN,"), "el CSV usa la moneda del perfil")
     }
 }
 
@@ -100,13 +102,5 @@ final class CacheTests: XCTestCase {
         XCTAssertEqual(vm.errorFeedback, 1)
     }
 
-    func testCurrencyIsRemembered() throws {
-        let suite = "test-\(UUID().uuidString)"
-        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
-
-        XCTAssertEqual(AppEnvironment.mock(defaults: defaults).currency, "USD")
-        AppEnvironment.mock(defaults: defaults).currency = "EUR"
-        XCTAssertEqual(AppEnvironment.mock(defaults: defaults).currency, "EUR")
-    }
+    // La moneda del perfil (cambio, rollback y caché por usuario) se prueba en CurrencyTests.
 }
