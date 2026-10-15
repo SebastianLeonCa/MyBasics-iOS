@@ -5,8 +5,13 @@ import Foundation
 nonisolated struct SupabaseConfig: Sendable {
     let url: URL
     let anonKey: String
-    /// OAuth client ID de Google (tipo iOS). nil = no se muestra "Continuar con Google".
+    /// OAuth client ID de Google (tipo iOS). nil = el botón avisa que falta configurarlo.
     let googleIOSClientID: String?
+
+    /// APPLE_SIGN_IN = YES en Secrets.xcconfig (requiere el Apple Developer Program).
+    static func isAppleSignInEnabled(_ bundle: Bundle = .main) -> Bool {
+        (bundle.object(forInfoDictionaryKey: "AppleSignInEnabled") as? String)?.uppercased() == "YES"
+    }
 
     /// nil si falta algún valor o siguen los placeholders de Secrets.example.xcconfig.
     static func fromBundle(_ bundle: Bundle = .main) -> SupabaseConfig? {

@@ -7,6 +7,8 @@
 	<string>$(SUPABASE_URL)</string>
 	<key>SupabaseAnonKey</key>
 	<string>$(SUPABASE_ANON_KEY)</string>
+	<key>AppleSignInEnabled</key>
+	<string>$(APPLE_SIGN_IN)</string>
 	<key>GoogleIOSClientID</key>
 	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
 	<!-- mybasics:// recibe los enlaces de confirmación de correo y de recuperar contraseña. -->

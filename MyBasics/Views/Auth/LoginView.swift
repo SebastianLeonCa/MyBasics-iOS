@@ -67,14 +67,17 @@ struct LoginView: View {
 
     private var socialButtons: some View {
         VStack(spacing: 12) {
-            SignInWithAppleButton(viewModel.mode == .signUp ? .signUp : .continue) { request in
-                viewModel.prepare(request)
-            } onCompletion: { result in
-                Task { await viewModel.completeApple(result) }
+            // Solo con APPLE_SIGN_IN = YES (requiere el Apple Developer Program).
+            if env.isAppleSignInEnabled {
+                SignInWithAppleButton(viewModel.mode == .signUp ? .signUp : .continue) { request in
+                    viewModel.prepare(request)
+                } onCompletion: { result in
+                    Task { await viewModel.completeApple(result) }
+                }
+                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                .frame(height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-            .frame(height: 50)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
 
             GoogleSignInButton {
                 Task {

@@ -22,8 +22,10 @@ final class AppEnvironment {
     let dataSource: DataSource
     /// Caché local del mes en curso (nil = sin caché, p. ej. en modo de ejemplo).
     let expenseCache: (any ExpenseCache)?
-    /// Client ID de Google (tipo iOS). nil = se oculta "Continuar con Google".
+    /// Client ID de Google (tipo iOS). nil = el botón avisa que falta configurarlo.
     let googleIOSClientID: String?
+    /// Sign in with Apple activo (APPLE_SIGN_IN = YES). Apagado = el botón no se muestra.
+    let isAppleSignInEnabled: Bool
 
     private(set) var sessionState: SessionState = .loading
     /// Se abrió un enlace de "olvidé mi contraseña": hay que pedir la nueva.
@@ -45,6 +47,7 @@ final class AppEnvironment {
         dataSource: DataSource,
         expenseCache: (any ExpenseCache)? = nil,
         googleIOSClientID: String? = nil,
+        isAppleSignInEnabled: Bool = SupabaseConfig.isAppleSignInEnabled(),
         defaults: UserDefaults = .standard
     ) {
         self.expenseRepository = expenseRepository
@@ -53,6 +56,7 @@ final class AppEnvironment {
         self.dataSource = dataSource
         self.expenseCache = expenseCache
         self.googleIOSClientID = googleIOSClientID
+        self.isAppleSignInEnabled = isAppleSignInEnabled
         self.defaults = defaults
     }
 
