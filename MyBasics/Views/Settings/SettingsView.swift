@@ -3,6 +3,10 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.openURL) private var openURL
+    @State private var confirmingSignOut = false
+    @State private var confirmingDelete = false
+    @State private var isWorking = false
+    @State private var alert: UserFacingError?
 
     var body: some View {
         @Bindable var env = env
@@ -59,11 +63,54 @@ struct SettingsView: View {
                     }
                 }
 
+                accountSection
+
                 Section {
                     LabeledContent("Versión", value: appVersion)
                 }
             }
             .navigationTitle("Ajustes")
+            .disabled(isWorking)
+            .overlay { if isWorking { ProgressView().controlSize(.large) } }
+            .confirmationDialog("¿Cerrar sesión?", isPresented: $confirmingSignOut, titleVisibility: .visible) {
+                Button("Cerrar sesión", role: .destructive) { run(env.signOut) }
+                Button("Cancelar", role: .cancel) {}
+            }
+            .alert("¿Eliminar tu cuenta?", isPresented: $confirmingDelete) {
+                Button("Eliminar cuenta", role: .destructive) { run(env.deleteAccount) }
+                Button("Cancelar", role: .cancel) {}
+            } message: {
+                Text("Se borrarán para siempre tu cuenta, tus gastos, categorías y compartidos. No se puede deshacer.")
+            }
+            .errorAlert($alert)
+        }
+    }
+
+    private var accountSection: some View {
+        Section {
+            LabeledContent {
+                Text(verbatim: env.authService.currentUserEmail ?? "—")
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            } label: {
+                Label("Cuenta", systemImage: "person.crop.circle")
+            }
+            Button("Cerrar sesión") { confirmingSignOut = true }
+            Button("Eliminar cuenta", role: .destructive) { confirmingDelete = true }
+        } footer: {
+            Text("Eliminar la cuenta borra todos tus datos de forma permanente.")
+        }
+    }
+
+    private func run(_ action: @escaping () async throws -> Void) {
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            do {
+                try await action()
+            } catch {
+                alert = UserFacingError(error)
+            }
         }
     }
 

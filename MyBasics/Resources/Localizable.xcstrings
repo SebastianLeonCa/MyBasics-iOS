@@ -97,6 +97,16 @@
         }
       }
     },
+    "Apple no devolvió una credencial válida.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple didn’t return a valid credential."
+          }
+        }
+      }
+    },
     "Ayer": {
       "localizations": {
         "en": {
@@ -163,6 +173,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Categories"
+          }
+        }
+      }
+    },
+    "Cerrar sesión": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign out"
           }
         }
       }
@@ -239,12 +259,62 @@
         }
       }
     },
-    "Conectando…": {
+    "Confirma tu correo: te enviamos un enlace al registrarte.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connecting…"
+            "value": "Confirm your email: we sent you a link when you signed up."
+          }
+        }
+      }
+    },
+    "Continuar con Google": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Google"
+          }
+        }
+      }
+    },
+    "Contraseña": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        }
+      }
+    },
+    "Contraseña actualizada": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password updated"
+          }
+        }
+      }
+    },
+    "Correo confirmado": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email confirmed"
+          }
+        }
+      }
+    },
+    "Crear cuenta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create account"
           }
         }
       }
@@ -255,6 +325,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "When you share an expense with someone, it will show here until it’s paid."
+          }
+        }
+      }
+    },
+    "Cuenta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account"
           }
         }
       }
@@ -285,6 +365,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "You need to sign in."
+          }
+        }
+      }
+    },
+    "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Wait a few minutes and try again."
           }
         }
       }
@@ -349,6 +439,16 @@
         }
       }
     },
+    "El enlace no es válido o ya expiró": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The link is invalid or has expired"
+          }
+        }
+      }
+    },
     "El idioma se cambia en Ajustes de iOS › MyBasics › Idioma.": {
       "localizations": {
         "en": {
@@ -389,12 +489,72 @@
         }
       }
     },
+    "Eliminar cuenta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete account"
+          }
+        }
+      }
+    },
+    "Eliminar la cuenta borra todos tus datos de forma permanente.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleting your account permanently erases all your data."
+          }
+        }
+      }
+    },
+    "Email": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email"
+          }
+        }
+      }
+    },
+    "Email o contraseña incorrectos.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect email or password."
+          }
+        }
+      }
+    },
+    "Escribe tu email arriba y vuelve a tocar “¿Olvidaste tu contraseña?”.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter your email above and tap “Forgot your password?” again."
+          }
+        }
+      }
+    },
     "Este mes tiene gastos en varias monedas; los totales no las convierten.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "This month has expenses in several currencies; totals don’t convert them."
+          }
+        }
+      }
+    },
+    "Este método de inicio de sesión no está habilitado en Supabase.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This sign-in method isn’t enabled in Supabase."
           }
         }
       }
@@ -489,6 +649,26 @@
         }
       }
     },
+    "Google no devolvió una respuesta válida. Inténtalo de nuevo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google didn’t return a valid response. Try again."
+          }
+        }
+      }
+    },
+    "Google rechazó el inicio de sesión.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google rejected the sign-in."
+          }
+        }
+      }
+    },
     "Gráfico de gastos por categoría": {
       "localizations": {
         "en": {
@@ -561,6 +741,26 @@
         }
       }
     },
+    "Iniciando sesión": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in"
+          }
+        }
+      }
+    },
+    "Iniciar sesión": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        }
+      }
+    },
     "Inicio": {
       "localizations": {
         "en": {
@@ -581,12 +781,42 @@
         }
       }
     },
+    "La contraseña es muy débil. Usa al menos 8 caracteres.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That password is too weak. Use at least 8 characters."
+          }
+        }
+      }
+    },
+    "La nueva contraseña debe ser distinta a la anterior.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The new password must be different from the old one."
+          }
+        }
+      }
+    },
     "La respuesta del servidor no tiene el formato esperado.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The server response wasn’t in the expected format."
+          }
+        }
+      }
+    },
+    "Las contraseñas no coinciden.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The passwords don’t match."
           }
         }
       }
@@ -661,6 +891,16 @@
         }
       }
     },
+    "Modo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mode"
+          }
+        }
+      }
+    },
     "Moneda": {
       "localizations": {
         "en": {
@@ -701,6 +941,16 @@
         }
       }
     },
+    "Mínimo %lld caracteres.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least %lld characters."
+          }
+        }
+      }
+    },
     "No": {
       "localizations": {
         "en": {
@@ -731,6 +981,16 @@
         }
       }
     },
+    "No se pudo cambiar la contraseña": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t change the password"
+          }
+        }
+      }
+    },
     "No se pudo cargar": {
       "localizations": {
         "en": {
@@ -741,22 +1001,22 @@
         }
       }
     },
-    "No se pudo conectar": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t connect"
-          }
-        }
-      }
-    },
     "No se pudo conectar con el servidor. Revisa SUPABASE_URL.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Couldn’t reach the server. Check SUPABASE_URL."
+          }
+        }
+      }
+    },
+    "No se pudo continuar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t continue"
           }
         }
       }
@@ -791,12 +1051,22 @@
         }
       }
     },
-    "No se pudo iniciar sesión con el usuario de prueba (%@). Revisa DEV_USER_EMAIL y DEV_USER_PASSWORD.": {
+    "No se pudo iniciar sesión con Apple": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Couldn’t sign in with the test user (%@). Check DEV_USER_EMAIL and DEV_USER_PASSWORD."
+            "value": "Couldn’t sign in with Apple"
+          }
+        }
+      }
+    },
+    "No se pudo iniciar sesión con Google": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t sign in with Google"
           }
         }
       }
@@ -847,6 +1117,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "New category"
+          }
+        }
+      }
+    },
+    "Nueva contraseña": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New password"
           }
         }
       }
@@ -975,6 +1255,16 @@
         }
       }
     },
+    "Repite la contraseña": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repeat the password"
+          }
+        }
+      }
+    },
     "Salud": {
       "comment": "Nombre de categoría por defecto",
       "extractionState": "manual",
@@ -997,12 +1287,32 @@
         }
       }
     },
+    "Se borrarán para siempre tu cuenta, tus gastos, categorías y compartidos. No se puede deshacer.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your account, expenses, categories, and shared items will be erased forever. This can’t be undone."
+          }
+        }
+      }
+    },
     "Se usa en los gastos nuevos y en los totales. Los gastos ya guardados conservan su moneda.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Used for new expenses and totals. Saved expenses keep their currency."
+          }
+        }
+      }
+    },
+    "Si existe una cuenta con %@, te llegará un correo para crear una contraseña nueva.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If an account exists for %@, you’ll get an email to create a new password."
           }
         }
       }
@@ -1150,6 +1460,16 @@
         }
       }
     },
+    "Te enviamos un correo a %@. Toca el enlace para activar tu cuenta y luego inicia sesión.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We sent an email to %@. Tap the link to activate your account, then sign in."
+          }
+        }
+      }
+    },
     "Tipo": {
       "localizations": {
         "en": {
@@ -1232,6 +1552,26 @@
         }
       }
     },
+    "Tu sesión expiró. Vuelve a iniciar sesión.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your session expired. Please sign in again."
+          }
+        }
+      }
+    },
+    "Tus gastos del día a día, en segundos.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your everyday spending, in seconds."
+          }
+        }
+      }
+    },
     "Variable": {
       "localizations": {
         "en": {
@@ -1272,6 +1612,26 @@
         }
       }
     },
+    "Ya existe una cuenta con ese email. Inicia sesión.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An account with that email already exists. Sign in instead."
+          }
+        }
+      }
+    },
+    "Ya puedes usarla para iniciar sesión.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can now use it to sign in."
+          }
+        }
+      }
+    },
     "al mes": {
       "localizations": {
         "en": {
@@ -1282,12 +1642,62 @@
         }
       }
     },
+    "o con tu email": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "or with your email"
+          }
+        }
+      }
+    },
+    "¡Listo! Tu cuenta está activa.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All set! Your account is active."
+          }
+        }
+      }
+    },
+    "¿Cerrar sesión?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign out?"
+          }
+        }
+      }
+    },
     "¿Eliminar este gasto?": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Delete this expense?"
+          }
+        }
+      }
+    },
+    "¿Eliminar tu cuenta?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete your account?"
+          }
+        }
+      }
+    },
+    "¿Olvidaste tu contraseña?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forgot your password?"
           }
         }
       }
