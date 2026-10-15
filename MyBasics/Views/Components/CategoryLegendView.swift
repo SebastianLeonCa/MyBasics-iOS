@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Leyenda del gráfico: color, nombre, monto y %; ordenada de mayor a menor. Cada fila también selecciona.
 struct CategoryLegendView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let totals: [CategoryTotal]
     let currency: String
     let selectedCategoryId: UUID?
@@ -17,16 +18,21 @@ struct CategoryLegendView: View {
                         Circle()
                             .fill(Color(hex: item.colorHex) ?? .gray)
                             .frame(width: 10, height: 10)
-                        Text(verbatim: item.name)
-                            .foregroundStyle(.primary)
-                        Spacer()
-                        Text(CurrencyFormatter.string(fromCents: item.amountCents, currency: currency))
-                            .monospacedDigit()
-                            .foregroundStyle(.primary)
-                        Text(item.share.formatted(.percent.precision(.fractionLength(0))))
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                            .frame(minWidth: 44, alignment: .trailing)
+                        AdaptiveStack(spacing: 10) {
+                            Text(verbatim: item.name)
+                                .foregroundStyle(.primary)
+                            if !dynamicTypeSize.isAccessibilitySize { Spacer() }
+                            HStack(spacing: 10) {
+                                Text(CurrencyFormatter.string(fromCents: item.amountCents, currency: currency))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.primary)
+                                Text(item.share.formatted(.percent.precision(.fractionLength(0))))
+                                    .monospacedDigit()
+                                    .foregroundStyle(.secondary)
+                                    .frame(minWidth: 44, alignment: .trailing)
+                            }
+                        }
+                        if dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 0) }
                     }
                     .font(.subheadline)
                     .padding(.vertical, 6)

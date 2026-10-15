@@ -3,9 +3,10 @@ import SwiftUI
 /// Fila estilo app bancaria: ícono, descripción, etiqueta Fijo/Variable, indicador de deuda y monto.
 struct ExpenseRow: View {
     let expense: Expense
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        HStack(spacing: 12) {
+        AdaptiveStack {
             CategoryIcon(
                 icon: expense.category?.icon ?? "tag",
                 colorHex: expense.category?.colorHex ?? "#8E8E93"
@@ -26,7 +27,7 @@ struct ExpenseRow: View {
                 }
             }
 
-            Spacer(minLength: 8)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
 
             Text(CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency))
                 .font(.body.weight(.semibold))

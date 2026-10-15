@@ -28,6 +28,7 @@ enum AppTab: Hashable, CaseIterable {
 struct CustomTabBar: View {
     @Binding var selection: AppTab
     let onAdd: () -> Void
+    @State private var addTaps = 0
 
     @ScaledMetric(relativeTo: .title) private var plusSize: CGFloat = 64
 
@@ -48,19 +49,32 @@ struct CustomTabBar: View {
                 .ignoresSafeArea(edges: .bottom)
         }
         .overlay(alignment: .top) { addButton.offset(y: -plusSize / 2) }
+        // Como la barra estándar de iOS: tamaño acotado y, con texto grande, pulsación larga
+        // muestra el "Visor de contenido grande".
+        .dynamicTypeSize(...DynamicTypeSize.xLarge)
+        .sensoryFeedback(.selection, trigger: selection)
+        .sensoryFeedback(.impact(weight: .light), trigger: addTaps)
     }
 
     private var addButton: some View {
-        Button(action: onAdd) {
+        Button {
+            addTaps += 1
+            onAdd()
+        } label: {
             Image(systemName: "plus")
                 .font(.system(size: plusSize * 0.42, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: plusSize, height: plusSize)
                 .background(Color.accentColor, in: Circle())
                 .shadow(color: .black.opacity(0.18), radius: 10, y: 5)
+                .symbolEffect(.bounce, value: addTaps)
         }
         .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("Nuevo gasto")
+        .accessibilityShowsLargeContentViewer {
+            Image(systemName: "plus")
+            Text("Nuevo gasto")
+        }
     }
 
     private func tabButton(_ tab: AppTab) -> some View {
@@ -70,6 +84,7 @@ struct CustomTabBar: View {
             VStack(spacing: 4) {
                 Image(systemName: selection == tab ? tab.selectedIcon : tab.icon)
                     .font(.title3)
+                    .symbolEffect(.bounce, value: selection == tab)
                 Text(tab.title)
                     .font(.caption2.weight(.medium))
                     .lineLimit(1)
@@ -80,6 +95,10 @@ struct CustomTabBar: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityShowsLargeContentViewer {
+            Image(systemName: tab.icon)
+            Text(tab.title)
+        }
         .accessibilityAddTraits(selection == tab ? [.isSelected] : [])
     }
 }

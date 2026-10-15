@@ -1,3 +1,4 @@
+import Accessibility
 import Charts
 import SwiftUI
 
@@ -53,6 +54,8 @@ struct DonutChartView: View {
             }
         }
         .frame(height: 240)
+        .accessibilityChartDescriptor(self)
+        .accessibilityLabel("Gráfico de gastos por categoría")
     }
 
     @ViewBuilder
@@ -61,10 +64,16 @@ struct DonutChartView: View {
             Text(selected?.name ?? String(localized: "Total"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-            Text(CurrencyFormatter.string(fromCents: selected?.amountCents ?? totalCents, currency: currency))
-                .font(.title2.weight(.bold))
-                .monospacedDigit()
-                .contentTransition(.numericText())
+            // El primer tamaño que quepa en el hueco del donut.
+            ViewThatFits(in: .horizontal) {
+                ForEach([Font.title2, .headline, .subheadline, .footnote], id: \.self) { font in
+                    Text(CurrencyFormatter.string(fromCents: selected?.amountCents ?? totalCents, currency: currency))
+                        .font(font.weight(.bold))
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                        .fixedSize()
+                }
+            }
             if let selected {
                 Text(percent(selected.share))
                     .font(.footnote.weight(.semibold))
@@ -72,8 +81,10 @@ struct DonutChartView: View {
             }
         }
         .lineLimit(1)
-        .minimumScaleFactor(0.5)
+        .minimumScaleFactor(0.4)
         .multilineTextAlignment(.center)
+        // El hueco del donut tiene un tamaño fijo: el texto crece hasta un tope (VoiceOver lee el valor completo).
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .combine)
     }
 
@@ -99,5 +110,35 @@ struct DonutChartView: View {
 
     private func percent(_ share: Double) -> String {
         share.formatted(.percent.precision(.fractionLength(0)))
+    }
+}
+
+/// Descripción del gráfico para VoiceOver (incluye "Gráficos de audio").
+/// Se describe con porcentajes, no con montos: el dinero nunca pasa a Double.
+extension DonutChartView: AXChartDescriptorRepresentable {
+    func makeChartDescriptor() -> AXChartDescriptor {
+        let categories = AXCategoricalDataAxisDescriptor(
+            title: String(localized: "Categoría"),
+            categoryOrder: totals.map(\.name))
+        let percentages = AXNumericDataAxisDescriptor(
+            title: String(localized: "Porcentaje del total"),
+            range: 0...100,
+            gridlinePositions: []) { value in "\(Int(value.rounded())) %" }
+        let series = AXDataSeriesDescriptor(
+            name: String(localized: "Gastos"),
+            isContinuous: false,
+            dataPoints: totals.map { item in
+                AXDataPoint(
+                    x: item.name,
+                    y: item.share * 100,
+                    label: CurrencyFormatter.string(fromCents: item.amountCents, currency: currency))
+            })
+        return AXChartDescriptor(
+            title: String(localized: "Gastos por categoría"),
+            summary: String(localized: "Total \(CurrencyFormatter.string(fromCents: totalCents, currency: currency))"),
+            xAxis: categories,
+            yAxis: percentages,
+            additionalAxes: [],
+            series: [series])
     }
 }
