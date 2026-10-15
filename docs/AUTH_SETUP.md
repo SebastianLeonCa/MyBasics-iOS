@@ -51,7 +51,11 @@ siempre se ve; mientras `GOOGLE_IOS_CLIENT_ID` esté vacío, al tocarlo la app a
 ## 2. Sign in with Apple
 
 Requiere el **Apple Developer Program** (99 USD/año) en <https://developer.apple.com/programs/>.
-Sin la membresía, Xcode no puede firmar la app con esta capacidad.
+Sin la membresía, Xcode no puede firmar la app con esta capacidad. Por eso viene **apagado**:
+con `APPLE_SIGN_IN = NO` la app se firma sin esa capacidad (sirve con un Apple ID gratuito) y el
+botón no aparece.
+
+0. Cuando tengas la membresía, en `Config/Secrets.xcconfig` pon `APPLE_SIGN_IN = YES` y haz ⇧⌘K.
 
 1. **Xcode** › proyecto › target **MyBasics** › **Signing & Capabilities**
    - *Team*: tu equipo pagado. *Automatically manage signing*: activado.
