@@ -22,8 +22,11 @@ struct LoginView: View {
         ScrollView {
             VStack(spacing: 28) {
                 header
-                socialButtons
-                divider
+                // Apple y Google solo aparecen si están configurados; sin ninguno, queda solo el email.
+                if hasSocialButtons {
+                    socialButtons
+                    divider
+                }
                 emailForm
             }
             .padding(.horizontal, 24)
@@ -65,6 +68,8 @@ struct LoginView: View {
         .padding(.top, 12)
     }
 
+    private var hasSocialButtons: Bool { env.isAppleSignInEnabled || viewModel.isGoogleConfigured }
+
     private var socialButtons: some View {
         VStack(spacing: 12) {
             // Solo con APPLE_SIGN_IN = YES (requiere el Apple Developer Program).
@@ -79,10 +84,13 @@ struct LoginView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
 
-            GoogleSignInButton {
-                Task {
-                    await viewModel.signInWithGoogle { url, scheme in
-                        try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: scheme)
+            // Solo con GOOGLE_IOS_CLIENT_ID en Secrets.xcconfig.
+            if viewModel.isGoogleConfigured {
+                GoogleSignInButton {
+                    Task {
+                        await viewModel.signInWithGoogle { url, scheme in
+                            try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: scheme)
+                        }
                     }
                 }
             }

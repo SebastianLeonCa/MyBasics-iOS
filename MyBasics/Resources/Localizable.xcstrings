@@ -579,16 +579,6 @@
         }
       }
     },
-    "Falta GOOGLE_IOS_CLIENT_ID en Config/Secrets.xcconfig. Los pasos están en docs/AUTH_SETUP.md.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "GOOGLE_IOS_CLIENT_ID is missing in Config/Secrets.xcconfig. The steps are in docs/AUTH_SETUP.md."
-          }
-        }
-      }
-    },
     "Fecha": {
       "localizations": {
         "en": {
@@ -655,16 +645,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expenses by category"
-          }
-        }
-      }
-    },
-    "Google aún no está configurado": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Google isn’t set up yet"
           }
         }
       }
