@@ -3,6 +3,9 @@ import SwiftUI
 @Observable
 final class HomeViewModel {
     private let repository: any ExpenseRepository
+    private let cache: (any ExpenseCache)?
+    /// Usuario actual, para guardar la caché por cuenta.
+    private let userId: () -> UUID?
     private let now: () -> Date
 
     /// Inicio del mes que se está mirando.
@@ -18,11 +21,25 @@ final class HomeViewModel {
     private(set) var hasLoaded = false
     /// Error de la carga del mes (se muestra en lugar de la lista, con "Reintentar").
     private(set) var loadError: String?
+    /// Lo que se ve viene de la caché local (aún no confirmado por el servidor).
+    private(set) var isShowingCachedData = false
     /// Error de una acción (guardar, eliminar): se muestra como alerta.
     var alert: UserFacingError?
 
-    init(repository: any ExpenseRepository, now: @escaping () -> Date = { .now }) {
+    /// Contadores que disparan la vibración (`.sensoryFeedback`) en la vista.
+    private(set) var savedFeedback = 0
+    private(set) var deletedFeedback = 0
+    private(set) var errorFeedback = 0
+
+    init(
+        repository: any ExpenseRepository,
+        cache: (any ExpenseCache)? = nil,
+        userId: @escaping () -> UUID? = { nil },
+        now: @escaping () -> Date = { .now }
+    ) {
         self.repository = repository
+        self.cache = cache
+        self.userId = userId
         self.now = now
         self.month = now().startOfMonth()
     }
@@ -59,10 +76,11 @@ final class HomeViewModel {
         expenses = []
         hasLoaded = false
         loadError = nil
+        isShowingCachedData = false
     }
 
     func toggleSelection(_ categoryId: UUID?) {
-        withAnimation(.snappy) {
+        Motion.animate(.snappy) {
             selectedCategoryId = (categoryId == selectedCategoryId) ? nil : categoryId
         }
     }
@@ -71,42 +89,73 @@ final class HomeViewModel {
 
     func load() async {
         let requested = month
+        // Abrir rápido: si hay caché de este mes, se muestra ya y luego se refresca.
+        if !hasLoaded, let cached = cachedExpenses(for: requested) {
+            expenses = cached
+            hasLoaded = true
+            isShowingCachedData = true
+        }
+
         isLoading = true
         defer { isLoading = false }
         do {
             let result = try await repository.fetchExpenses(in: requested.monthInterval())
             guard requested == month else { return }   // el usuario ya cambió de mes
-            withAnimation(.smooth) {
+            Motion.animate {
                 expenses = result
                 hasLoaded = true
                 loadError = nil
+                isShowingCachedData = false
                 if selectedTotal == nil { selectedCategoryId = nil }
             }
+            storeCache()
         } catch is CancellationError {
             return
         } catch {
             guard requested == month else { return }
             if hasLoaded {
-                // Ya hay datos en pantalla: los dejamos y avisamos.
-                alert = UserFacingError(error, retry: { [weak self] in await self?.load() })
+                // Ya hay datos en pantalla (o de la caché): los dejamos y avisamos.
+                alert = UserFacingError(
+                    error,
+                    title: isShowingCachedData
+                        ? String(localized: "Mostrando datos guardados")
+                        : String(localized: "Algo salió mal"),
+                    retry: { [weak self] in await self?.load() })
             } else {
                 loadError = UserFacingError.describe(error)
             }
         }
     }
 
+    // MARK: - Caché (solo el mes en curso)
+
+    private var isCurrentMonth: Bool { month == now().startOfMonth() }
+
+    private func cachedExpenses(for month: Date) -> [Expense]? {
+        guard let cache, let userId = userId(), month == now().startOfMonth() else { return nil }
+        return cache.expenses(for: month, userId: userId)
+    }
+
+    private func storeCache() {
+        guard let cache, let userId = userId(), isCurrentMonth, !isShowingCachedData else { return }
+        cache.store(expenses, for: month, userId: userId)
+    }
+
     /// Guardado optimista: se ve al instante; si el servidor falla, se revierte y se ofrece reintentar.
     func save(_ expense: Expense, isNew: Bool) async {
         let previous = expenses.first { $0.id == expense.id }
         applyLocally(expense)
+        savedFeedback += 1
         do {
             let saved = isNew ? try await repository.create(expense) : try await repository.update(expense)
             applyLocally(saved)   // versión del servidor (con la categoría embebida)
+            storeCache()
         } catch {
-            withAnimation(.smooth) {
+            Motion.animate {
                 expenses.removeAll { $0.id == expense.id }
                 if let previous { expenses.append(previous) }
             }
+            errorFeedback += 1
             alert = UserFacingError(
                 error,
                 title: String(localized: "No se pudo guardar el gasto"),
@@ -116,14 +165,17 @@ final class HomeViewModel {
 
     /// Eliminación optimista con rollback.
     func delete(_ expense: Expense) async {
-        withAnimation(.smooth) {
+        Motion.animate {
             expenses.removeAll { $0.id == expense.id }
             if selectedTotal == nil { selectedCategoryId = nil }
         }
+        deletedFeedback += 1
         do {
             try await repository.delete(id: expense.id)
+            storeCache()
         } catch {
             applyLocally(expense)
+            errorFeedback += 1
             alert = UserFacingError(
                 error,
                 title: String(localized: "No se pudo eliminar el gasto"),
@@ -133,7 +185,7 @@ final class HomeViewModel {
 
     /// Inserta/reemplaza en la lista si pertenece al mes visible (si no, lo quita).
     private func applyLocally(_ expense: Expense) {
-        withAnimation(.smooth) {
+        Motion.animate {
             expenses.removeAll { $0.id == expense.id }
             if month.monthInterval().contains(expense.spentAt) {
                 expenses.append(expense)

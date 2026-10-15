@@ -6,12 +6,24 @@ struct RootView: View {
     @State private var homeViewModel: HomeViewModel
     @State private var tab: AppTab = .home
     @State private var editor: ExpenseEditorRoute?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(environment: AppEnvironment) {
-        _homeViewModel = State(initialValue: HomeViewModel(repository: environment.expenseRepository))
+        let auth = environment.authService
+        _homeViewModel = State(initialValue: HomeViewModel(
+            repository: environment.expenseRepository,
+            cache: environment.expenseCache,
+            userId: { auth.currentUserId }))
     }
 
     var body: some View {
+        sessionContent
+            .onAppear { Motion.isReduced = reduceMotion }
+            .onChange(of: reduceMotion) { _, value in Motion.isReduced = value }
+    }
+
+    @ViewBuilder
+    private var sessionContent: some View {
         switch env.sessionState {
         case .ready:
             content
@@ -42,7 +54,7 @@ struct RootView: View {
                     onAdd: { editor = ExpenseEditorRoute(expense: nil) }
                 )
             case .shared:
-                SharedView(repository: env.expenseRepository)
+                SharedView(repository: env.expenseRepository, currency: env.currency)
             case .subscriptions:
                 SubscriptionsView(repository: env.expenseRepository)
             case .settings:
