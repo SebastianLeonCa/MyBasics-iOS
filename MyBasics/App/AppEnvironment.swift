@@ -34,7 +34,6 @@ final class AppEnvironment {
     var linkMessage: UserFacingError?
 
     private var eventsTask: Task<Void, Never>?
-    private let defaults: UserDefaults
 
     /// Moneda con la que se muestran todos los montos. Es fija (USD, "$"): la app no convierte
     /// ni guarda moneda por gasto; cada persona lee el "$" como su moneda.
@@ -47,8 +46,7 @@ final class AppEnvironment {
         dataSource: DataSource,
         expenseCache: (any ExpenseCache)? = nil,
         googleIOSClientID: String? = nil,
-        isAppleSignInEnabled: Bool = SupabaseConfig.isAppleSignInEnabled(),
-        defaults: UserDefaults = .standard
+        isAppleSignInEnabled: Bool = SupabaseConfig.isAppleSignInEnabled()
     ) {
         self.expenseRepository = expenseRepository
         self.categoryRepository = categoryRepository
@@ -57,7 +55,6 @@ final class AppEnvironment {
         self.expenseCache = expenseCache
         self.googleIOSClientID = googleIOSClientID
         self.isAppleSignInEnabled = isAppleSignInEnabled
-        self.defaults = defaults
     }
 
     /// Supabase si Config/Secrets.xcconfig está completo; si no (o en tests), datos de ejemplo.
@@ -87,8 +84,7 @@ final class AppEnvironment {
     /// `withSampleData: false` arranca vacío (útil para ver el estado vacío).
     static func mock(
         withSampleData: Bool = true,
-        signedIn: Bool = true,
-        defaults: UserDefaults = .standard
+        signedIn: Bool = true
     ) -> AppEnvironment {
         let categories = MockCategoryRepository()
         let expenses = withSampleData ? MockData.expenses(categories: categories.categories) : []
@@ -96,8 +92,7 @@ final class AppEnvironment {
             expenseRepository: MockExpenseRepository(expenses: expenses, categories: { categories.categories }),
             categoryRepository: categories,
             authService: MockAuthService(signedIn: signedIn),
-            dataSource: .mock,
-            defaults: defaults
+            dataSource: .mock
         )
     }
 
