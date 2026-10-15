@@ -1,7 +1,7 @@
 # Autenticación real (Fase 4): Apple, Google y email
 
-Haz las partes en este orden. Cada una se puede probar por separado: la app muestra solo los
-botones que estén configurados (Google aparece solo si `GOOGLE_IOS_CLIENT_ID` tiene valor).
+Haz las partes en este orden. Cada una se puede probar por separado. El botón de Google
+siempre se ve; mientras `GOOGLE_IOS_CLIENT_ID` esté vacío, al tocarlo la app avisa qué falta.
 
 > **Antes de empezar:** vuelve a ejecutar [`supabase/schema.sql`](../supabase/schema.sql) en el
 > SQL Editor (agrega `delete_my_account()` para "Eliminar cuenta"). Es seguro: no borra datos.

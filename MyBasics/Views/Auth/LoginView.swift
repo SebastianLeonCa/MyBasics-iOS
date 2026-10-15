@@ -32,14 +32,15 @@ struct LoginView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.interactively)
-        .background(Color(.systemGroupedBackground))
+        .background(ThemedBackground())
         .disabled(viewModel.isWorking)
         .overlay {
             if viewModel.isWorking {
                 ProgressView()
                     .controlSize(.large)
+                    .tint(Theme.accent)
                     .padding(24)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 16))
                     .accessibilityLabel("Iniciando sesión")
             }
         }
@@ -52,12 +53,13 @@ struct LoginView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 84, height: 84)
+                .shadow(color: Theme.accent.opacity(0.45), radius: 24)
                 .accessibilityHidden(true)
             Text(verbatim: "MyBasics")
-                .font(.largeTitle.weight(.bold))
+                .font(.system(.largeTitle, design: .rounded, weight: .bold))
             Text("Tus gastos del día a día, en segundos.")
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 12)
@@ -74,12 +76,10 @@ struct LoginView: View {
             .frame(height: 50)
             .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            if viewModel.supportsGoogle {
-                GoogleSignInButton {
-                    Task {
-                        await viewModel.signInWithGoogle { url, scheme in
-                            try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: scheme)
-                        }
+            GoogleSignInButton {
+                Task {
+                    await viewModel.signInWithGoogle { url, scheme in
+                        try await webAuthenticationSession.authenticate(using: url, callbackURLScheme: scheme)
                     }
                 }
             }
@@ -88,23 +88,21 @@ struct LoginView: View {
 
     private var divider: some View {
         HStack(spacing: 12) {
-            Rectangle().fill(.separator).frame(height: 1)
+            Rectangle().fill(Theme.stroke).frame(height: 1)
             Text("o con tu email")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Theme.textTertiary)
                 .fixedSize()
-            Rectangle().fill(.separator).frame(height: 1)
+            Rectangle().fill(Theme.stroke).frame(height: 1)
         }
         .accessibilityHidden(true)
     }
 
     private var emailForm: some View {
         VStack(spacing: 14) {
-            Picker("Modo", selection: $viewModel.mode.animation()) {
-                Text("Iniciar sesión").tag(LoginViewModel.Mode.signIn)
-                Text("Crear cuenta").tag(LoginViewModel.Mode.signUp)
+            PillPicker(options: [LoginViewModel.Mode.signIn, .signUp], selection: $viewModel.mode) { mode in
+                mode == .signIn ? String(localized: "Iniciar sesión") : String(localized: "Crear cuenta")
             }
-            .pickerStyle(.segmented)
 
             VStack(spacing: 0) {
                 TextField("Email", text: $viewModel.email)
@@ -124,13 +122,14 @@ struct LoginView: View {
                     .onSubmit { Task { await viewModel.submit() } }
                     .padding(14)
             }
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
 
             if viewModel.mode == .signUp {
                 Label("Mínimo \(LoginViewModel.minimumPasswordLength) caracteres.",
                       systemImage: viewModel.isPasswordValid ? "checkmark.circle.fill" : "circle")
                     .font(.footnote)
-                    .foregroundStyle(viewModel.isPasswordValid ? Color.green : .secondary)
+                    .foregroundStyle(viewModel.isPasswordValid ? Theme.positive : Theme.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
@@ -139,7 +138,7 @@ struct LoginView: View {
                     .font(.callout)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                    .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .transition(.opacity)
             }
 
@@ -149,10 +148,15 @@ struct LoginView: View {
             } label: {
                 Text(viewModel.mode == .signUp ? "Crear cuenta" : "Iniciar sesión")
                     .font(.headline)
+                    .foregroundStyle(viewModel.canSubmit ? Color.black : Theme.textTertiary)
                     .frame(maxWidth: .infinity, minHeight: 50)
+                    .background {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(viewModel.canSubmit ? AnyShapeStyle(Theme.accentGradient) : AnyShapeStyle(Theme.surfaceRaised))
+                    }
+                    .contentShape(RoundedRectangle(cornerRadius: 12))
             }
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.roundedRectangle(radius: 12))
+            .buttonStyle(PressScaleButtonStyle())
             .disabled(!viewModel.canSubmit)
 
             if viewModel.mode == .signIn {
@@ -160,7 +164,8 @@ struct LoginView: View {
                     focused = nil
                     Task { await viewModel.sendPasswordReset() }
                 }
-                .font(.subheadline)
+                .font(.subheadline.weight(.medium))
+                .tint(Theme.accent)
             }
         }
     }

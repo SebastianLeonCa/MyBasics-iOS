@@ -17,20 +17,24 @@ struct NewPasswordView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    SecureField("Nueva contraseña", text: $password)
-                        .textContentType(.newPassword)
-                    SecureField("Repite la contraseña", text: $confirmation)
-                        .textContentType(.newPassword)
-                } footer: {
-                    if !confirmation.isEmpty && password != confirmation {
-                        Text("Las contraseñas no coinciden.").foregroundStyle(.red)
-                    } else {
-                        Text("Mínimo \(LoginViewModel.minimumPasswordLength) caracteres.")
+                Group {
+                    Section {
+                        SecureField("Nueva contraseña", text: $password)
+                            .textContentType(.newPassword)
+                        SecureField("Repite la contraseña", text: $confirmation)
+                            .textContentType(.newPassword)
+                    } footer: {
+                        if !confirmation.isEmpty && password != confirmation {
+                            Text("Las contraseñas no coinciden.").foregroundStyle(.red)
+                        } else {
+                            Text("Mínimo \(LoginViewModel.minimumPasswordLength) caracteres.")
+                        }
                     }
                 }
+                .themedRows()
             }
             .navigationTitle("Nueva contraseña")
+            .themedScreen()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -50,6 +54,7 @@ struct NewPasswordView: View {
             .sensoryFeedback(.success, trigger: saved)
         }
         .presentationDetents([.medium])
+        .presentationBackground(Theme.background)
     }
 
     private func save() {

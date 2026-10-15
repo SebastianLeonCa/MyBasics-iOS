@@ -62,7 +62,7 @@ final class LoginViewModelTests: XCTestCase {
             vm.email = bad
             XCTAssertFalse(vm.isEmailValid, bad)
         }
-        XCTAssertFalse(vm.supportsGoogle)
+        XCTAssertFalse(vm.isGoogleConfigured)
     }
 
     func testSignInCallsBackAndErrorsAreShown() async {
@@ -95,7 +95,7 @@ final class LoginViewModelTests: XCTestCase {
         XCTAssertEqual(vm.mode, .signIn, "vuelve a Iniciar sesión para cuando confirme")
         XCTAssertTrue(vm.password.isEmpty)
         XCTAssertNil(auth.currentUserId)
-        XCTAssertTrue(vm.supportsGoogle)
+        XCTAssertTrue(vm.isGoogleConfigured)
     }
 
     func testPasswordResetNeedsEmail() async {

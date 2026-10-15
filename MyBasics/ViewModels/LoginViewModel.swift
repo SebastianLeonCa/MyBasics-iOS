@@ -29,7 +29,8 @@ final class LoginViewModel {
         self.onSignedIn = onSignedIn
     }
 
-    var supportsGoogle: Bool { google != nil }
+    /// Si es false, el botón de Google igual se muestra, pero avisa que falta configurarlo.
+    var isGoogleConfigured: Bool { google != nil }
     var trimmedEmail: String { email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
 
     var isEmailValid: Bool {
@@ -108,7 +109,12 @@ final class LoginViewModel {
 
     /// `authenticate` abre la hoja web del sistema (WebAuthenticationSession de SwiftUI) y devuelve la URL de vuelta.
     func signInWithGoogle(authenticate: (URL, String) async throws -> URL) async {
-        guard let google else { return }
+        guard let google else {
+            alert = UserFacingError(
+                title: String(localized: "Google aún no está configurado"),
+                message: String(localized: "Falta GOOGLE_IOS_CLIENT_ID en Config/Secrets.xcconfig. Los pasos están en docs/AUTH_SETUP.md."))
+            return
+        }
         let request = google.makeRequest()
         do {
             let callback = try await authenticate(request.url, google.callbackScheme)
