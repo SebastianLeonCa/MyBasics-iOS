@@ -41,7 +41,7 @@ nonisolated struct DaySection: Identifiable, Hashable, Sendable {
     /// Inicio del día.
     let day: Date
     let expenses: [Expense]
-    var totalCents: Int { expenses.reduce(0) { $0 + $1.amountCents } }
+    var totalCents: Int { expenses.reduce(0) { $0 + $1.netAmountCents } }
 }
 
 /// Funciones puras (sin estado) que usa HomeViewModel. Cubiertas por tests unitarios.
@@ -50,18 +50,21 @@ nonisolated enum ExpenseAnalytics {
         expenses.filter(filter.matches)
     }
 
+    /// Suma de lo que de verdad costó cada gasto (neto de lo que ya te devolvieron).
     static func total(_ expenses: [Expense]) -> Int {
-        expenses.reduce(0) { $0 + $1.amountCents }
+        expenses.reduce(0) { $0 + $1.netAmountCents }
     }
 
-    /// Totales por categoría, de mayor a menor (empate: por nombre).
+    /// Totales por categoría, de mayor a menor (empate: por nombre). Las categorías que quedan
+    /// en $0 (p. ej. todo te lo devolvieron) no aparecen.
     static func categoryTotals(_ expenses: [Expense]) -> [CategoryTotal] {
         let grandTotal = total(expenses)
         guard grandTotal > 0 else { return [] }
 
         let grouped = Dictionary(grouping: expenses, by: \.categoryId)
-        return grouped.map { categoryId, items in
+        return grouped.compactMap { categoryId, items -> CategoryTotal? in
             let amount = total(items)
+            guard amount > 0 else { return nil }
             let category = items.first?.category
             return CategoryTotal(
                 categoryId: categoryId,

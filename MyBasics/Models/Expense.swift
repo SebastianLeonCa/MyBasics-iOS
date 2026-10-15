@@ -70,4 +70,14 @@ nonisolated extension Expense {
     }
 
     var hasPendingDebt: Bool { debts.contains { !$0.isSettled } }
+
+    /// Lo que ya te devolvieron: compartidos "Me debe" marcados como pagados.
+    var reimbursedCents: Int {
+        debts.filter { $0.direction == .theyOweMe && $0.isSettled }.reduce(0) { $0 + $1.amountCents }
+    }
+
+    /// Lo que de verdad te costó: el monto pagado menos lo que ya te devolvieron.
+    /// Es lo que cuentan los totales, el gráfico y la lista. ("Le debo" no resta: ese gasto
+    /// ya se registra solo por tu parte.)
+    var netAmountCents: Int { max(amountCents - reimbursedCents, 0) }
 }
