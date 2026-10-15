@@ -36,7 +36,7 @@ final class ExportViewModel {
     }
 
     /// Trae los gastos del mes y deja listo el archivo para compartir.
-    func prepare() async {
+    func prepare(currency: String) async {
         let requested = month
         isLoading = true
         defer { isLoading = false }
@@ -44,7 +44,7 @@ final class ExportViewModel {
             let result = try await repository.fetchExpenses(in: requested.monthInterval())
             guard requested == month else { return }
             expenses = result
-            fileURL = result.isEmpty ? nil : try CSVExporter.writeFile(for: result, month: requested)
+            fileURL = result.isEmpty ? nil : try CSVExporter.writeFile(for: result, month: requested, currency: currency)
             loadError = nil
         } catch is CancellationError {
             return

@@ -40,7 +40,7 @@ final class AddExpenseViewModel {
     ) {
         self.editingExpense = expense
         self.categoryRepository = categoryRepository
-        self.currency = expense?.currency ?? currency
+        self.currency = currency
 
         if let expense {
             amountText = CurrencyFormatter.inputString(fromCents: expense.amountCents, currency: self.currency)
@@ -64,7 +64,15 @@ final class AddExpenseViewModel {
     var usesDecimals: Bool { CurrencyFormatter.inputDecimals(for: currency) > 0 }
     var selectedCategory: Category? { categories.first { $0.id == categoryId } }
 
-    var amountCents: Int? { CurrencyFormatter.cents(fromInput: amountText, currency: currency) }
+    var amountCents: Int? {
+        if let original = editingExpense, amountText == originalAmountText { return original.amountCents }
+        return CurrencyFormatter.cents(fromInput: amountText, currency: currency)
+    }
+
+    /// Texto con el que se precargó el monto al editar (para saber si se tocó).
+    private var originalAmountText: String? {
+        editingExpense.map { CurrencyFormatter.inputString(fromCents: $0.amountCents, currency: currency) }
+    }
     /// Sugerencia para "Me debe": la mitad del total (redondeada a lo que se puede escribir).
     var suggestedDebtCents: Int? {
         amountCents.map { CurrencyFormatter.roundedToInputable($0 / 2, currency: currency) }
@@ -81,10 +89,15 @@ final class AddExpenseViewModel {
     var debtAmountCents: Int? {
         switch debtDirection {
         case .theyOweMe:
-            debtAmountText.isEmpty
+            if let debt = editingExpense?.debts.first, debt.direction == .theyOweMe,
+               debtAmountText == CurrencyFormatter.inputString(fromCents: debt.amountCents, currency: currency) {
+                return debt.amountCents   // no lo tocaste: se conserva exacto
+            }
+            return debtAmountText.isEmpty
                 ? suggestedDebtCents
                 : CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency)
-        case .iOweThem: amountCents
+        case .iOweThem:
+            return amountCents
         }
     }
 
@@ -152,7 +165,6 @@ final class AddExpenseViewModel {
             id: editingExpense?.id ?? UUID(),
             categoryId: categoryId,
             amountCents: amount,
-            currency: currency,
             kind: kind,
             note: trimmedNote.isEmpty ? nil : trimmedNote,
             spentAt: spentAt,

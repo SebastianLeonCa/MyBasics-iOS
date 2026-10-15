@@ -3,11 +3,10 @@ import SwiftUI
 /// Exporta los gastos de un mes a CSV y los comparte (Archivos, Mail, AirDrop, Numbers…).
 struct ExportView: View {
     @State private var viewModel: ExportViewModel
-    let currency: String
+    @Environment(\.currency) private var currency
 
-    init(repository: any ExpenseRepository, currency: String) {
+    init(repository: any ExpenseRepository) {
         _viewModel = State(initialValue: ExportViewModel(repository: repository))
-        self.currency = currency
     }
 
     var body: some View {
@@ -29,7 +28,7 @@ struct ExportView: View {
                             Text("Preparando archivo…").foregroundStyle(.secondary)
                         }
                     } else if let error = viewModel.loadError {
-                        LoadErrorView(message: error) { await viewModel.prepare() }
+                        LoadErrorView(message: error) { await viewModel.prepare(currency: currency) }
                     } else if let url = viewModel.fileURL {
                         LabeledContent("Gastos", value: "\(viewModel.expenses.count)")
                         LabeledContent("Total") {
@@ -53,6 +52,7 @@ struct ExportView: View {
         }
         .navigationTitle("Exportar CSV")
         .themedScreen()
-        .task(id: viewModel.month) { await viewModel.prepare() }
+        // Se rehace el archivo si cambia el mes o la moneda.
+        .task(id: "\(viewModel.month.timeIntervalSince1970)-\(currency)") { await viewModel.prepare(currency: currency) }
     }
 }

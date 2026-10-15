@@ -3,11 +3,10 @@ import SwiftUI
 /// "Compartidos": gastos que dividiste con alguien. Agrupado por persona con su saldo neto.
 struct SharedView: View {
     @State private var viewModel: SharedViewModel
-    let currency: String
+    @Environment(\.currency) private var currency
 
-    init(repository: any ExpenseRepository, currency: String) {
+    init(repository: any ExpenseRepository) {
         _viewModel = State(initialValue: SharedViewModel(repository: repository))
-        self.currency = currency
     }
 
     var body: some View {
@@ -62,7 +61,7 @@ struct SharedView: View {
     private func header(for balance: PersonBalance) -> some View {
         let amount = CurrencyFormatter.string(
             fromCents: abs(balance.netCents),
-            currency: balance.items.first?.expense.currency ?? CurrencyFormatter.defaultCurrency)
+            currency: currency)
         return HStack {
             Text(verbatim: balance.name)
             Spacer()
@@ -112,7 +111,7 @@ struct SharedView: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text(CurrencyFormatter.string(fromCents: share.debt.amountCents, currency: share.expense.currency))
+                Text(CurrencyFormatter.string(fromCents: share.debt.amountCents, currency: currency))
                     .font(Theme.amount(.body, weight: .semibold))
                 Text(verbatim: share.debt.direction.displayName)
                     .font(.caption)

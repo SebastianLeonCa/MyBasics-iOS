@@ -8,7 +8,6 @@ nonisolated struct SubscriptionSummary: Identifiable, Hashable, Sendable {
     let name: String
     let icon: String
     let colorHex: String
-    let currency: String
     /// Monto del último cobro.
     let lastAmountCents: Int
     let lastChargeAt: Date
@@ -48,7 +47,6 @@ nonisolated enum SubscriptionAnalytics {
                 name: (name?.isEmpty == false ? name : nil) ?? String(localized: "Suscripción"),
                 icon: last.category?.icon ?? "repeat",
                 colorHex: last.category?.colorHex ?? "#5E60CE",
-                currency: last.currency,
                 lastAmountCents: last.amountCents,
                 lastChargeAt: last.spentAt,
                 chargeCount: charges.count,

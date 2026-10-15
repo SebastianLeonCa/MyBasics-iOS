@@ -4,6 +4,7 @@ import SwiftUI
 /// Activa = tuvo un cobro en los últimos 35 días.
 struct SubscriptionsView: View {
     @State private var viewModel: SubscriptionsViewModel
+    @Environment(\.currency) private var currency
 
     init(repository: any ExpenseRepository) {
         _viewModel = State(initialValue: SubscriptionsViewModel(repository: repository))
@@ -20,7 +21,7 @@ struct SubscriptionsView: View {
                                 .foregroundStyle(.secondary)
                             Text(CurrencyFormatter.string(
                                 fromCents: viewModel.monthlyTotalCents,
-                                currency: viewModel.currency ?? CurrencyFormatter.defaultCurrency))
+                                currency: currency))
                                 .font(Theme.amount(.largeTitle))
                                 .foregroundStyle(Theme.accent)
                                 .contentTransition(.numericText())
@@ -88,7 +89,7 @@ struct SubscriptionsView: View {
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
-                Text(CurrencyFormatter.string(fromCents: item.lastAmountCents, currency: item.currency))
+                Text(CurrencyFormatter.string(fromCents: item.lastAmountCents, currency: currency))
                     .font(Theme.amount(.body, weight: .semibold))
                     .foregroundStyle(item.isActive ? .primary : .secondary)
                 if item.isActive {

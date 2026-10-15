@@ -3,7 +3,7 @@ import Foundation
 /// Exporta gastos a CSV (RFC 4180). Función pura: fácil de testear.
 nonisolated enum CSVExporter {
     /// Montos con punto decimal y sin separador de miles, para que cualquier planilla los lea como número.
-    static func csv(for expenses: [Expense], calendar: Calendar = .app) -> String {
+    static func csv(for expenses: [Expense], currency: String, calendar: Calendar = .app) -> String {
         let header = [
             String(localized: "Fecha"),
             String(localized: "Descripción"),
@@ -33,7 +33,7 @@ nonisolated enum CSVExporter {
                 expense.kind.displayName,
                 decimalString(expense.amountCents),
                 decimalString(expense.netAmountCents),
-                expense.currency,
+                currency,
                 debt?.counterpartyName ?? "",
                 debt.map { decimalString($0.amountCents) } ?? "",
                 debt?.direction.displayName ?? "",
@@ -71,12 +71,12 @@ nonisolated enum CSVExporter {
     }
 
     /// Escribe el CSV (UTF-8 con BOM para que Excel respete los acentos) en una carpeta temporal.
-    static func writeFile(for expenses: [Expense], month: Date) throws -> URL {
+    static func writeFile(for expenses: [Expense], month: Date, currency: String) throws -> URL {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Export", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let url = directory.appendingPathComponent(fileName(for: month))
         var data = Data([0xEF, 0xBB, 0xBF])
-        data.append(Data(csv(for: expenses).utf8))
+        data.append(Data(csv(for: expenses, currency: currency).utf8))
         try data.write(to: url, options: .atomic)
         return url
     }

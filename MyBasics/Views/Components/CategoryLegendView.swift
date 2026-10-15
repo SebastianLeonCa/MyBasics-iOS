@@ -4,7 +4,7 @@ import SwiftUI
 struct CategoryLegendView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let totals: [CategoryTotal]
-    let currency: String
+    @Environment(\.currency) private var currency
     let selectedCategoryId: UUID?
     let onSelect: (UUID?) -> Void
 

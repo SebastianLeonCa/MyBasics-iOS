@@ -107,6 +107,16 @@
         }
       }
     },
+    "Cambiar a %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change to %@"
+          }
+        }
+      }
+    },
     "Cancelar": {
       "localizations": {
         "en": {
@@ -539,22 +549,22 @@
         }
       }
     },
+    "Es el símbolo con el que se muestran todos tus montos. Cambiarla no convierte ningún valor.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It’s the symbol all your amounts are shown with. Changing it doesn’t convert any value."
+          }
+        }
+      }
+    },
     "Escribe tu email arriba y vuelve a tocar “¿Olvidaste tu contraseña?”.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Enter your email above and tap “Forgot your password?” again."
-          }
-        }
-      }
-    },
-    "Este mes tiene gastos en varias monedas; los totales no las convierten.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This month has expenses in several currencies; totals don’t convert them."
           }
         }
       }
@@ -1021,6 +1031,16 @@
         }
       }
     },
+    "No se pudo cambiar la moneda": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t change the currency"
+          }
+        }
+      }
+    },
     "No se pudo cargar": {
       "localizations": {
         "en": {
@@ -1347,16 +1367,6 @@
         }
       }
     },
-    "Se usa en los gastos nuevos y en los totales. Los gastos ya guardados conservan su moneda.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Used for new expenses and totals. Saved expenses keep their currency."
-          }
-        }
-      }
-    },
     "Si existe una cuenta con %@, te llegará un correo para crear una contraseña nueva.": {
       "localizations": {
         "en": {
@@ -1443,6 +1453,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "No subscriptions"
+          }
+        }
+      }
+    },
+    "Solo cambiará el símbolo con el que se muestran tus montos. No se hará ninguna conversión: si tenías %@, verás %@.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the symbol your amounts are shown with will change. Nothing gets converted: if you had %1$@, you’ll see %2$@."
           }
         }
       }
@@ -1758,6 +1778,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "All set! Your account is active."
+          }
+        }
+      }
+    },
+    "¿Cambiar moneda a %@ (%@)?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change currency to %1$@ (%2$@)?"
           }
         }
       }

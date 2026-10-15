@@ -18,8 +18,6 @@ final class SubscriptionsViewModel {
     var active: [SubscriptionSummary] { summaries.filter(\.isActive) }
     var inactive: [SubscriptionSummary] { summaries.filter { !$0.isActive } }
     var monthlyTotalCents: Int { SubscriptionAnalytics.monthlyActiveTotal(summaries) }
-    /// Moneda del total (la de la suscripción activa más reciente).
-    var currency: String? { active.first?.currency }
 
     func load() async {
         isLoading = true

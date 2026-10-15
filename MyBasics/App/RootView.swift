@@ -31,6 +31,10 @@ struct RootView: View {
             NewPasswordView()
         }
         .errorAlert($env.linkMessage)
+        .errorAlert($env.currencyError)
+        // La moneda del perfil llega a todas las vistas (y hojas) por el entorno:
+        // al cambiarla, toda la interfaz se redibuja al instante.
+        .environment(\.currency, env.currency)
         .tint(Theme.accent)
         .preferredColorScheme(.dark)
         .onAppear { Motion.isReduced = reduceMotion }
@@ -59,12 +63,11 @@ struct SignedInView: View {
             case .home:
                 HomeView(
                     viewModel: homeViewModel,
-                    currency: env.currency,
                     onEdit: { editor = ExpenseEditorRoute(expense: $0) },
                     onAdd: { editor = ExpenseEditorRoute(expense: nil) }
                 )
             case .shared:
-                SharedView(repository: env.expenseRepository, currency: env.currency)
+                SharedView(repository: env.expenseRepository)
             case .subscriptions:
                 SubscriptionsView(repository: env.expenseRepository)
             case .settings:
@@ -76,6 +79,7 @@ struct SignedInView: View {
                 editor = ExpenseEditorRoute(expense: nil)
             }
         }
+        .task { await env.loadCurrency() }
         .sheet(item: $editor) { route in
             AddExpenseView(
                 viewModel: AddExpenseViewModel(

@@ -5,6 +5,7 @@ import SwiftUI
 struct ExpenseRow: View {
     let expense: Expense
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.currency) private var currency
 
     var body: some View {
         AdaptiveStack {
@@ -67,7 +68,7 @@ struct ExpenseRow: View {
     }
 
     private func money(_ cents: Int) -> String {
-        CurrencyFormatter.string(fromCents: cents, currency: expense.currency)
+        CurrencyFormatter.string(fromCents: cents, currency: currency)
     }
 
     private var accessibilityText: String {

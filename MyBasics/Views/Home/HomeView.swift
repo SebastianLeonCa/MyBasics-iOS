@@ -2,7 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Bindable var viewModel: HomeViewModel
-    let currency: String
+    @Environment(\.currency) private var currency
     let onEdit: (Expense) -> Void
     let onAdd: () -> Void
 
@@ -82,7 +82,7 @@ struct HomeView: View {
                 }
                 Button("Cancelar", role: .cancel) {}
             } message: { expense in
-                Text("\(expense.displayTitle) · \(CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency))")
+                Text("\(expense.displayTitle) · \(CurrencyFormatter.string(fromCents: expense.netAmountCents, currency: currency))")
             }
             .errorAlert($viewModel.alert)
         }
@@ -122,14 +122,12 @@ struct HomeView: View {
                     DonutChartView(
                         totals: viewModel.categoryTotals,
                         totalCents: viewModel.totalCents,
-                        currency: currency,
                         selectedCategoryId: viewModel.selectedCategoryId,
                         onSelect: viewModel.toggleSelection
                     )
 
                     CategoryLegendView(
                         totals: viewModel.categoryTotals,
-                        currency: currency,
                         selectedCategoryId: viewModel.selectedCategoryId,
                         onSelect: viewModel.toggleSelection
                     )
@@ -170,16 +168,7 @@ struct HomeView: View {
             .font(.caption)
             .foregroundStyle(Theme.textSecondary)
             .transition(.opacity)
-        } else if hasMixedCurrencies {
-            Label("Este mes tiene gastos en varias monedas; los totales no las convierten.",
-                  systemImage: "exclamationmark.circle")
-                .font(.caption)
-                .foregroundStyle(.orange)
         }
-    }
-
-    private var hasMixedCurrencies: Bool {
-        Set(viewModel.filteredExpenses.map(\.currency)).count > 1
     }
 
     /// Anillo gris con $0 cuando no hay datos, para que la pantalla no "salte".
@@ -226,7 +215,7 @@ struct HomeView: View {
     let env = AppEnvironment.mock()
     return HomeView(
         viewModel: HomeViewModel(repository: env.expenseRepository),
-        currency: "USD", onEdit: { _ in }, onAdd: {}
+        onEdit: { _ in }, onAdd: {}
     )
     .environment(env)
 }

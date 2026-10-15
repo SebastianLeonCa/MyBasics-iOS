@@ -6,7 +6,7 @@ import SwiftUI
 struct DonutChartView: View {
     let totals: [CategoryTotal]
     let totalCents: Int
-    let currency: String
+    @Environment(\.currency) private var currency
     let selectedCategoryId: UUID?
     let onSelect: (UUID?) -> Void
 
