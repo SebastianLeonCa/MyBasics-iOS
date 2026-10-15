@@ -107,16 +107,6 @@
         }
       }
     },
-    "Cambiar a %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Change to %@"
-          }
-        }
-      }
-    },
     "Cancelar": {
       "localizations": {
         "en": {
@@ -545,16 +535,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Incorrect email or password."
-          }
-        }
-      }
-    },
-    "Es el símbolo con el que se muestran todos tus montos. Cambiarla no convierte ningún valor.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It’s the symbol all your amounts are shown with. Changing it doesn’t convert any value."
           }
         }
       }
@@ -1031,16 +1011,6 @@
         }
       }
     },
-    "No se pudo cambiar la moneda": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Couldn’t change the currency"
-          }
-        }
-      }
-    },
     "No se pudo cargar": {
       "localizations": {
         "en": {
@@ -1457,16 +1427,6 @@
         }
       }
     },
-    "Solo cambiará el símbolo con el que se muestran tus montos. No se hará ninguna conversión: si tenías %@, verás %@.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Only the symbol your amounts are shown with will change. Nothing gets converted: if you had %1$@, you’ll see %2$@."
-          }
-        }
-      }
-    },
     "Supermercado": {
       "comment": "Nombre de categoría por defecto",
       "extractionState": "manual",
@@ -1778,16 +1738,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "All set! Your account is active."
-          }
-        }
-      }
-    },
-    "¿Cambiar moneda a %@ (%@)?": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Change currency to %1$@ (%2$@)?"
           }
         }
       }

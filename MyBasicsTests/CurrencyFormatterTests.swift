@@ -87,64 +87,13 @@ final class CurrencyFormatterTests: XCTestCase {
     }
 }
 
-/// Moneda del perfil: única fuente de verdad, con caché local por usuario.
+/// La moneda de la app es fija (USD); el formateador sigue soportando otras.
 @MainActor
 final class CurrencyTests: XCTestCase {
-    private func makeEnvironment(profile: MockProfileRepository) throws -> (AppEnvironment, UserDefaults, String) {
-        let suite = "test-\(UUID().uuidString)"
-        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
-        let env = AppEnvironment(
-            expenseRepository: MockExpenseRepository(),
-            categoryRepository: MockCategoryRepository(),
-            authService: MockAuthService(signedIn: true),
-            profileRepository: profile,
-            dataSource: .mock,
-            defaults: defaults)
-        return (env, defaults, suite)
-    }
-
-    func testLoadsCurrencyFromProfile() async throws {
-        let (env, defaults, suite) = try makeEnvironment(profile: MockProfileRepository(currency: "PEN"))
-        defer { defaults.removePersistentDomain(forName: suite) }
-        XCTAssertEqual(env.currency, "USD")
-        await env.loadCurrency()
-        XCTAssertEqual(env.currency, "PEN")
-    }
-
-    func testChangeIsSavedToProfileAndCachedPerUser() async throws {
-        let profile = MockProfileRepository(currency: "USD")
-        let (env, defaults, suite) = try makeEnvironment(profile: profile)
-        defer { defaults.removePersistentDomain(forName: suite) }
-        await env.loadCurrency()
-
-        await env.changeCurrency(to: "CLP")
-        XCTAssertEqual(env.currency, "CLP", "se ve al instante")
-        XCTAssertEqual(profile.currency, "CLP", "guardado en el perfil")
-
-        // Sin conexión al abrir de nuevo: se usa la copia local del mismo usuario.
-        profile.failUpdates = true
-        let offline = AppEnvironment(
-            expenseRepository: MockExpenseRepository(), categoryRepository: MockCategoryRepository(),
-            authService: MockAuthService(signedIn: true), profileRepository: FailingProfileRepository(),
-            dataSource: .mock, defaults: defaults)
-        await offline.loadCurrency()
-        XCTAssertEqual(offline.currency, "CLP")
-    }
-
-    func testFailedChangeRollsBackAndOffersRetry() async throws {
-        let profile = MockProfileRepository(currency: "USD")
-        let (env, defaults, suite) = try makeEnvironment(profile: profile)
-        defer { defaults.removePersistentDomain(forName: suite) }
-        await env.loadCurrency()
-
-        profile.failUpdates = true
-        await env.changeCurrency(to: "PEN")
-        XCTAssertEqual(env.currency, "USD", "rollback")
-        XCTAssertNotNil(env.currencyError?.retry)
-
-        profile.failUpdates = false
-        await env.currencyError?.retry?()
-        XCTAssertEqual(env.currency, "PEN")
+    func testAppCurrencyIsFixedUSD() {
+        XCTAssertEqual(AppEnvironment.mock().currency, "USD")
+        XCTAssertEqual(CurrencyFormatter.string(fromCents: 500_000, currency: AppEnvironment.mock().currency,
+                                                locale: Locale(identifier: "en_US")), "$5,000.00")
     }
 
     func testEditingInCLPKeepsStoredCentsIfAmountUntouched() throws {
@@ -158,9 +107,4 @@ final class CurrencyTests: XCTestCase {
         vm.setAmountText("15")
         XCTAssertEqual(try XCTUnwrap(vm.makeExpense()).amountCents, 1_500)
     }
-}
-
-private final class FailingProfileRepository: ProfileRepository {
-    func fetchCurrency() async throws -> String? { throw URLError(.notConnectedToInternet) }
-    func updateCurrency(_ currency: String) async throws { throw URLError(.notConnectedToInternet) }
 }

@@ -4,34 +4,14 @@ struct SettingsView: View {
     @Environment(AppEnvironment.self) private var env
     @Environment(\.openURL) private var openURL
     @State private var confirmingSignOut = false
-    /// Moneda elegida en la lista, a la espera de confirmación.
-    @State private var pendingCurrency: String?
     @State private var confirmingDelete = false
     @State private var isWorking = false
     @State private var alert: UserFacingError?
 
     var body: some View {
-        @Bindable var env = env
         NavigationStack {
             List {
                 Group {
-                    Section {
-                        Picker(selection: Binding(
-                        get: { env.currency },
-                        // No se aplica todavía: primero se confirma.
-                        set: { pendingCurrency = $0 }
-                    )) {
-                        ForEach(CurrencyOptions.codes, id: \.self) { code in
-                            Text(verbatim: "\(CurrencyFormatter.name(for: code)) (\(CurrencyFormatter.symbol(for: code)))").tag(code)
-                        }
-                    } label: {
-                        Label("Moneda", systemImage: "dollarsign.circle")
-                    }
-                    .pickerStyle(.navigationLink)
-                    } footer: {
-                        Text("Es el símbolo con el que se muestran todos tus montos. Cambiarla no convierte ningún valor.")
-                    }
-
                     Section {
                         NavigationLink {
                             CategoriesView(repository: env.categoryRepository)
@@ -82,18 +62,6 @@ struct SettingsView: View {
             .themedScreen()
             .disabled(isWorking)
             .overlay { if isWorking { ProgressView().controlSize(.large).tint(Theme.accent) } }
-            .alert(
-                currencyAlertTitle,
-                isPresented: Binding(get: { pendingCurrency != nil }, set: { if !$0 { pendingCurrency = nil } }),
-                presenting: pendingCurrency
-            ) { code in
-                Button("Cancelar", role: .cancel) {}
-                Button("Cambiar a \(CurrencyFormatter.symbol(for: code))") {
-                    Task { await env.changeCurrency(to: code) }
-                }
-            } message: { code in
-                Text("Solo cambiará el símbolo con el que se muestran tus montos. No se hará ninguna conversión: si tenías \(CurrencyFormatter.string(fromCents: 10_000, currency: env.currency)), verás \(CurrencyFormatter.string(fromCents: 10_000, currency: code)).")
-            }
             .alert("¿Seguro que quieres cerrar sesión?", isPresented: $confirmingSignOut) {
                 Button("No", role: .cancel) {}
                 Button("Sí, cerrar sesión", role: .destructive) { run(env.signOut) }
@@ -108,11 +76,6 @@ struct SettingsView: View {
             }
             .errorAlert($alert)
         }
-    }
-
-    private var currencyAlertTitle: String {
-        guard let code = pendingCurrency else { return "" }
-        return String(localized: "¿Cambiar moneda a \(CurrencyFormatter.name(for: code)) (\(CurrencyFormatter.symbol(for: code)))?")
     }
 
     private var accountSection: some View {

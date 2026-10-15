@@ -31,9 +31,7 @@ struct RootView: View {
             NewPasswordView()
         }
         .errorAlert($env.linkMessage)
-        .errorAlert($env.currencyError)
-        // La moneda del perfil llega a todas las vistas (y hojas) por el entorno:
-        // al cambiarla, toda la interfaz se redibuja al instante.
+        // Una sola moneda para toda la app (y sus hojas), desde un único lugar.
         .environment(\.currency, env.currency)
         .tint(Theme.accent)
         .preferredColorScheme(.dark)
@@ -79,7 +77,6 @@ struct SignedInView: View {
                 editor = ExpenseEditorRoute(expense: nil)
             }
         }
-        .task { await env.loadCurrency() }
         .sheet(item: $editor) { route in
             AddExpenseView(
                 viewModel: AddExpenseViewModel(
