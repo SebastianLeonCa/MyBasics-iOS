@@ -10,6 +10,8 @@ final class SharedViewModel {
     private(set) var hasLoaded = false
     private(set) var loadError: String?
     var alert: UserFacingError?
+    private(set) var paidFeedback = 0
+    private(set) var errorFeedback = 0
 
     init(repository: any ExpenseRepository) {
         self.repository = repository
@@ -39,11 +41,13 @@ final class SharedViewModel {
 
     /// Marca como pagado; se quita de la lista al instante y vuelve si el servidor falla.
     func markPaid(_ share: PendingShare) async {
-        withAnimation(.smooth) { shares.removeAll { $0.id == share.id } }
+        Motion.animate { shares.removeAll { $0.id == share.id } }
+        paidFeedback += 1
         do {
             try await repository.settleDebt(id: share.debt.id)
         } catch {
-            withAnimation(.smooth) { shares.append(share) }   // el orden lo recalcula `balances`
+            Motion.animate { shares.append(share) }   // el orden lo recalcula `balances`
+            errorFeedback += 1
             alert = UserFacingError(
                 error,
                 title: String(localized: "No se pudo marcar como pagado"),

@@ -40,6 +40,7 @@ struct CategoriesView: View {
             }
         }
         .task { await viewModel.load() }
+        .refreshable { await viewModel.load() }
         .sheet(isPresented: $showingNew) {
             NewCategoryView { category in
                 try await viewModel.add(category)

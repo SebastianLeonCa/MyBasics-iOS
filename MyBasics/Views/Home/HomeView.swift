@@ -65,6 +65,11 @@ struct HomeView: View {
             .contentMargins(.top, 8, for: .scrollContent)
             .toolbar(.hidden, for: .navigationBar)
             .task(id: viewModel.month) { await viewModel.load() }
+            .refreshable { await viewModel.load() }
+            .sensoryFeedback(.success, trigger: viewModel.savedFeedback)
+            .sensoryFeedback(.impact(weight: .medium), trigger: viewModel.deletedFeedback)
+            .sensoryFeedback(.error, trigger: viewModel.errorFeedback)
+            .sensoryFeedback(.selection, trigger: viewModel.selectedCategoryId)
             .confirmationDialog(
                 "¿Eliminar este gasto?",
                 isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
@@ -90,13 +95,15 @@ struct HomeView: View {
                 MonthNavigator(
                     title: viewModel.monthTitle,
                     canGoForward: viewModel.canGoToNextMonth,
-                    onPrevious: { withAnimation(.smooth) { viewModel.showPreviousMonth() } },
-                    onNext: { withAnimation(.smooth) { viewModel.showNextMonth() } }
+                    onPrevious: { Motion.animate { viewModel.showPreviousMonth() } },
+                    onNext: { Motion.animate { viewModel.showNextMonth() } }
                 )
+
+                statusLine
 
                 Picker("Tipo de gasto", selection: Binding(
                     get: { viewModel.filter },
-                    set: { newValue in withAnimation(.smooth) { viewModel.filter = newValue } }
+                    set: { newValue in Motion.animate { viewModel.filter = newValue } }
                 )) {
                     ForEach(KindFilter.allCases) { Text($0.displayName).tag($0) }
                 }
@@ -128,6 +135,32 @@ struct HomeView: View {
             }
             .padding(.vertical, 8)
         }
+    }
+
+    /// "Actualizando…" mientras se refresca la caché, o un aviso si se está sin conexión.
+    @ViewBuilder
+    private var statusLine: some View {
+        if viewModel.isShowingCachedData {
+            Group {
+                if viewModel.isLoading {
+                    Label { Text("Actualizando…") } icon: { ProgressView().controlSize(.mini) }
+                } else {
+                    Label("Sin conexión · mostrando datos guardados", systemImage: "icloud.slash")
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .transition(.opacity)
+        } else if hasMixedCurrencies {
+            Label("Este mes tiene gastos en varias monedas; los totales no las convierten.",
+                  systemImage: "exclamationmark.circle")
+                .font(.caption)
+                .foregroundStyle(.orange)
+        }
+    }
+
+    private var hasMixedCurrencies: Bool {
+        Set(viewModel.filteredExpenses.map(\.currency)).count > 1
     }
 
     /// Anillo gris con $0 cuando no hay datos, para que la pantalla no "salte".

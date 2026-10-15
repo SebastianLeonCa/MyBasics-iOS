@@ -60,6 +60,7 @@ struct SubscriptionsView: View {
             }
             .navigationTitle("Suscripciones")
             .task { await viewModel.load() }
+            .refreshable { await viewModel.load() }
 
         }
     }

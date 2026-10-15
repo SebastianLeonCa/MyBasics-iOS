@@ -3,9 +3,11 @@ import SwiftUI
 /// "Compartidos": gastos que dividiste con alguien. Agrupado por persona con su saldo neto.
 struct SharedView: View {
     @State private var viewModel: SharedViewModel
+    let currency: String
 
-    init(repository: any ExpenseRepository) {
+    init(repository: any ExpenseRepository, currency: String) {
         _viewModel = State(initialValue: SharedViewModel(repository: repository))
+        self.currency = currency
     }
 
     var body: some View {
@@ -46,6 +48,9 @@ struct SharedView: View {
             }
             .navigationTitle("Compartidos")
             .task { await viewModel.load() }
+            .refreshable { await viewModel.load() }
+            .sensoryFeedback(.success, trigger: viewModel.paidFeedback)
+            .sensoryFeedback(.error, trigger: viewModel.errorFeedback)
             .errorAlert($viewModel.alert)
         }
     }
@@ -75,7 +80,7 @@ struct SharedView: View {
             Label(title, systemImage: icon)
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(color)
-            Text(CurrencyFormatter.string(fromCents: cents))
+            Text(CurrencyFormatter.string(fromCents: cents, currency: currency))
                 .font(.title3.weight(.bold))
                 .monospacedDigit()
                 .lineLimit(1)
