@@ -180,13 +180,13 @@ final class AddExpenseViewModelTests: XCTestCase {
 
     func testEditingPreloadsAndKeepsIds() async throws {
         var original = F.expense(F.food, units: 4_000, at: F.date(2026, 10, 10), note: "Pizza")
-        original.debts = [Debt(counterpartyName: "Ana", amountCents: 200_000, direction: .iOweThem)]
+        original.debts = [Debt(counterpartyName: "Ana", amountCents: 200_000, direction: .theyOweMe)]
         let vm = makeViewModel(editing: original)
 
         XCTAssertTrue(vm.isEditing)
         XCTAssertEqual(vm.amountText, "4000")
         XCTAssertEqual(vm.debtPerson, "Ana")
-        XCTAssertEqual(vm.debtDirection, .iOweThem)
+        XCTAssertEqual(vm.debtDirection, .theyOweMe)
 
         vm.setAmountText("4500")
         let edited = try XCTUnwrap(vm.makeExpense())
@@ -194,6 +194,10 @@ final class AddExpenseViewModelTests: XCTestCase {
         XCTAssertEqual(edited.debts.first?.id, original.debts.first?.id)
         XCTAssertEqual(edited.debts.first?.amountCents, 200_000, "la deuda editada no se recalcula")
         XCTAssertEqual(edited.amountCents, 450_000)
+
+        // Con "Le debo", lo que debo es siempre el gasto completo (mi parte).
+        vm.debtDirection = .iOweThem
+        XCTAssertEqual(try XCTUnwrap(vm.makeExpense()).debts.first?.amountCents, 450_000)
     }
 }
 

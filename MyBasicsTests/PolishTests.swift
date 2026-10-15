@@ -14,10 +14,10 @@ final class CSVExporterTests: XCTestCase {
             .components(separatedBy: "\r\n").filter { !$0.isEmpty }
 
         XCTAssertEqual(lines.count, 3)
-        XCTAssertEqual(lines[0].split(separator: ",").count, 10)
+        XCTAssertEqual(lines[0].split(separator: ",").count, 11)
         XCTAssertTrue(lines[1].hasPrefix("2026-10-01 09:00,Arriendo,"), "ordenado por fecha")
-        XCTAssertTrue(lines[1].contains(",1200.00,USD,"), lines[1])
-        XCTAssertTrue(lines[2].contains(",4500.50,USD,Juan,25.25,"), lines[2])
+        XCTAssertTrue(lines[1].contains(",1200.00,1200.00,USD,"), lines[1])
+        XCTAssertTrue(lines[2].contains(",4500.50,4500.50,USD,Juan,25.25,"), "pendiente: aún no resta · \(lines[2])")
     }
 
     func testEscapesCommasQuotesAndFormulas() {
