@@ -1,12 +1,22 @@
 {
   "sourceLanguage": "es",
   "strings": {
-    "%@ te debe": {
+    "%@ te debe %@": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ owes you"
+            "value": "%1$@ owes you %2$@"
+          }
+        }
+      }
+    },
+    "%@ te pagó %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ paid you %2$@"
           }
         }
       }
@@ -83,16 +93,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Something went wrong"
-          }
-        }
-      }
-    },
-    "Aparecerá en Compartidos hasta que lo marques como pagado.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It will show in Shared until you mark it as paid."
           }
         }
       }
@@ -305,6 +305,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Email confirmed"
+          }
+        }
+      }
+    },
+    "Costo neto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Net cost"
           }
         }
       }
@@ -941,6 +951,16 @@
         }
       }
     },
+    "Monto que te debe": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amount they owe you"
+          }
+        }
+      }
+    },
     "Mostrando datos guardados": {
       "localizations": {
         "en": {
@@ -1195,6 +1215,26 @@
         }
       }
     },
+    "Pagaste %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You paid %@"
+          }
+        }
+      }
+    },
+    "Pagaste %@. Cuando te pague, tu gasto quedará en %@.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You paid %1$@. Once they pay you back, this expense will count as %2$@."
+          }
+        }
+      }
+    },
     "Persona": {
       "localizations": {
         "en": {
@@ -1241,6 +1281,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next charge ≈ %@"
+          }
+        }
+      }
+    },
+    "Registra solo tu parte: ese monto es lo que debes. Al marcarlo como pagado, el gasto se mantiene y sale de lo que debes.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter only your share: that’s what you owe. When you mark it as paid, the expense stays and leaves what you owe."
           }
         }
       }
@@ -1456,6 +1506,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yes, sign out"
+          }
+        }
+      }
+    },
+    "Te debe": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owes you"
           }
         }
       }

@@ -119,38 +119,57 @@ struct AddExpenseView: View {
     private var debtSection: some View {
         Section {
             DisclosureGroup(isExpanded: $viewModel.hasDebt.animation()) {
+                // Primero quién le debe a quién: define si hace falta un monto aparte.
+                PillPicker(options: DebtDirection.allCases, selection: $viewModel.debtDirection.animation(), title: \.displayName)
+                    .accessibilityLabel("¿Quién le debe a quién?")
+
                 TextField("Persona", text: $viewModel.debtPerson)
                     .textContentType(.name)
                     .focused($focusedField, equals: .debtPerson)
 
-                HStack(spacing: 4) {
-                    Text("Monto")
-                    Spacer()
-                    Text(CurrencyFormatter.symbol(for: viewModel.currency))
-                        .foregroundStyle(.secondary)
-                    TextField(amountPlaceholder, text: Binding(
-                        get: { viewModel.debtAmountText },
-                        set: { viewModel.setDebtAmountText($0) }
-                    ))
-                    .keyboardType(viewModel.usesDecimals ? .decimalPad : .numberPad)
-                    .multilineTextAlignment(.trailing)
-                    .fixedSize()
-                    .focused($focusedField, equals: .debtAmount)
-                    .accessibilityLabel("Monto compartido")
+                // "Me debe": cuánto de lo que pagaste te van a devolver.
+                // "Le debo": no se pide: debes el gasto completo (tu parte).
+                if viewModel.debtDirection == .theyOweMe {
+                    HStack(spacing: 4) {
+                        Text("Te debe")
+                        Spacer()
+                        Text(CurrencyFormatter.symbol(for: viewModel.currency))
+                            .foregroundStyle(Theme.textSecondary)
+                        TextField(amountPlaceholder, text: Binding(
+                            get: { viewModel.debtAmountText },
+                            set: { viewModel.setDebtAmountText($0) }
+                        ))
+                        .keyboardType(viewModel.usesDecimals ? .decimalPad : .numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .fixedSize()
+                        .focused($focusedField, equals: .debtAmount)
+                        .accessibilityLabel("Monto que te debe")
+                    }
+                    .transition(.opacity)
                 }
-
-                PillPicker(options: DebtDirection.allCases, selection: $viewModel.debtDirection, title: \.displayName)
-                    .accessibilityLabel("¿Quién le debe a quién?")
             } label: {
                 Label("Compartido con alguien", systemImage: "person.2")
             }
         } footer: {
             if viewModel.hasDebt && !viewModel.isDebtValid {
                 Text("Indica la persona y un monto mayor que 0 y no mayor al gasto.")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Theme.negative)
             } else if viewModel.hasDebt {
-                Text("Aparecerá en Compartidos hasta que lo marques como pagado.")
+                debtExplanation
             }
+        }
+    }
+
+    /// Explica qué pasará al marcarlo como pagado, con los montos reales.
+    @ViewBuilder
+    private var debtExplanation: some View {
+        switch viewModel.debtDirection {
+        case .theyOweMe:
+            if let net = viewModel.netAfterReimbursementCents, let amount = viewModel.amountCents {
+                Text("Pagaste \(CurrencyFormatter.string(fromCents: amount, currency: viewModel.currency)). Cuando te pague, tu gasto quedará en \(CurrencyFormatter.string(fromCents: net, currency: viewModel.currency)).")
+            }
+        case .iOweThem:
+            Text("Registra solo tu parte: ese monto es lo que debes. Al marcarlo como pagado, el gasto se mantiene y sale de lo que debes.")
         }
     }
 

@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Fila estilo app bancaria: ícono, descripción, etiqueta Fijo/Variable, indicador de deuda y monto.
+/// Fila estilo app bancaria: ícono, descripción, etiqueta Fijo/Variable, estado del compartido y monto.
+/// El monto es lo que de verdad te costó: si te devolvieron parte, se ve el neto y el original tachado.
 struct ExpenseRow: View {
     let expense: Expense
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -18,10 +19,10 @@ struct ExpenseRow: View {
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     KindBadge(kind: expense.kind)
-                    if expense.hasPendingDebt, let debt = expense.debts.first(where: { !$0.isSettled }) {
-                        Label(debt.counterpartyName, systemImage: "person.2.fill")
+                    if let status = sharedStatus {
+                        Label(status.text, systemImage: status.icon)
                             .font(.caption.weight(.medium))
-                            .foregroundStyle(Theme.negative)
+                            .foregroundStyle(status.color)
                             .lineLimit(1)
                     }
                 }
@@ -29,26 +30,58 @@ struct ExpenseRow: View {
 
             if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
 
-            Text(CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency))
-                .font(Theme.amount(.body, weight: .semibold))
+            VStack(alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .trailing, spacing: 2) {
+                Text(money(expense.netAmountCents))
+                    .font(Theme.amount(.body, weight: .semibold))
+                if expense.reimbursedCents > 0 {
+                    Text(money(expense.amountCents))
+                        .font(Theme.amount(.caption, weight: .medium))
+                        .strikethrough()
+                        .foregroundStyle(Theme.textTertiary)
+                }
+            }
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
     }
 
-    private var accessibilityText: String {
-        var parts = [
-            expense.displayTitle,
-            CurrencyFormatter.string(fromCents: expense.amountCents, currency: expense.currency),
-            expense.kind.displayName,
-        ]
-        if let category = expense.category?.displayName, category != expense.displayTitle { parts.insert(category, at: 1) }
+    private struct SharedStatus {
+        let text: String
+        let icon: String
+        let color: Color
+    }
+
+    /// Pendiente primero (es lo accionable); si no, lo que ya te devolvieron.
+    private var sharedStatus: SharedStatus? {
         if let debt = expense.debts.first(where: { !$0.isSettled }) {
-            parts.append(debt.direction == .theyOweMe
-                ? String(localized: "\(debt.counterpartyName) te debe")
-                : String(localized: "Le debes a \(debt.counterpartyName)"))
+            return debt.direction == .theyOweMe
+                ? SharedStatus(
+                    text: String(localized: "\(debt.counterpartyName) te debe \(money(debt.amountCents))"),
+                    icon: "arrow.down.left", color: Theme.positive)
+                : SharedStatus(
+                    text: String(localized: "Le debes a \(debt.counterpartyName)"),
+                    icon: "arrow.up.right", color: Theme.negative)
         }
+        if let paid = expense.debts.first(where: { $0.isSettled && $0.direction == .theyOweMe }) {
+            return SharedStatus(
+                text: String(localized: "\(paid.counterpartyName) te pagó \(money(paid.amountCents))"),
+                icon: "checkmark.circle", color: Theme.textSecondary)
+        }
+        return nil
+    }
+
+    private func money(_ cents: Int) -> String {
+        CurrencyFormatter.string(fromCents: cents, currency: expense.currency)
+    }
+
+    private var accessibilityText: String {
+        var parts = [expense.displayTitle, money(expense.netAmountCents), expense.kind.displayName]
+        if let category = expense.category?.displayName, category != expense.displayTitle { parts.insert(category, at: 1) }
+        if expense.reimbursedCents > 0 {
+            parts.append(String(localized: "Pagaste \(money(expense.amountCents))"))
+        }
+        if let status = sharedStatus { parts.append(status.text) }
         return parts.joined(separator: ", ")
     }
 }

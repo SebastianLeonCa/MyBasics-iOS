@@ -24,6 +24,7 @@ final class AddExpenseViewModel {
         didSet { if hasDebt { syncDebtAmountIfNeeded() } }
     }
     var debtPerson = ""
+    /// Solo se usa con "Me debe": cuánto de lo que pagaste te van a devolver.
     private(set) var debtAmountText = ""
     var debtDirection: DebtDirection = .theyOweMe
     /// Si el usuario tocó el monto compartido, deja de seguir "la mitad del gasto".
@@ -67,7 +68,20 @@ final class AddExpenseViewModel {
     var selectedCategory: Category? { categories.first { $0.id == categoryId } }
 
     var amountCents: Int? { CurrencyFormatter.cents(fromInput: amountText, currency: currency) }
-    var debtAmountCents: Int? { CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency) }
+    /// "Me debe": el monto que escribiste (por defecto, la mitad).
+    /// "Le debo": el gasto completo. Registras solo tu parte y eso es lo que debes; no se pide otro monto.
+    var debtAmountCents: Int? {
+        switch debtDirection {
+        case .theyOweMe: CurrencyFormatter.cents(fromInput: debtAmountText, currency: currency)
+        case .iOweThem: amountCents
+        }
+    }
+
+    /// Con "Me debe": lo que te costará el gasto una vez que te paguen.
+    var netAfterReimbursementCents: Int? {
+        guard debtDirection == .theyOweMe, let amount = amountCents, let debt = debtAmountCents else { return nil }
+        return max(amount - debt, 0)
+    }
 
     var isDebtValid: Bool {
         guard hasDebt else { return true }
