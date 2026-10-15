@@ -3,10 +3,9 @@ import Foundation
 nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
     var id: UUID
     var categoryId: UUID
-    /// Monto en centavos. Nunca Double.
+    /// Monto en centésimos de la unidad (×100 en todas las monedas). Nunca Double.
+    /// No guarda moneda: la moneda es una sola, la del perfil.
     var amountCents: Int
-    /// Código ISO 4217, p. ej. "USD".
-    var currency: String
     var kind: ExpenseKind
     var note: String?
     var spentAt: Date
@@ -18,7 +17,6 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         id: UUID = UUID(),
         categoryId: UUID,
         amountCents: Int,
-        currency: String = "USD",
         kind: ExpenseKind = .variable,
         note: String? = nil,
         spentAt: Date = .now,
@@ -28,7 +26,6 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         self.id = id
         self.categoryId = categoryId
         self.amountCents = amountCents
-        self.currency = currency
         self.kind = kind
         self.note = note
         self.spentAt = spentAt
@@ -40,7 +37,6 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         case id
         case categoryId = "category_id"
         case amountCents = "amount_cents"
-        case currency
         case kind
         case note
         case spentAt = "spent_at"
@@ -53,7 +49,6 @@ nonisolated struct Expense: Identifiable, Codable, Hashable, Sendable {
         id = try c.decode(UUID.self, forKey: .id)
         categoryId = try c.decode(UUID.self, forKey: .categoryId)
         amountCents = try c.decode(Int.self, forKey: .amountCents)
-        currency = try c.decodeIfPresent(String.self, forKey: .currency) ?? "USD"
         kind = try c.decode(ExpenseKind.self, forKey: .kind)
         note = try c.decodeIfPresent(String.self, forKey: .note)
         spentAt = try c.decode(Date.self, forKey: .spentAt)

@@ -95,7 +95,6 @@ nonisolated enum MockData {
             return Expense(
                 categoryId: category.id,
                 amountCents: seed.cents,
-                currency: "USD",
                 kind: seed.kind,
                 note: seed.note,
                 spentAt: date,

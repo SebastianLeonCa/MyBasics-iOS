@@ -7,11 +7,11 @@ nonisolated enum SupabaseQuery {
 
     /// Gasto con su categoría y sus montos compartidos embebidos (una sola consulta).
     static let expenseColumns =
-        "id,category_id,amount_cents,currency,kind,note,spent_at,category:categories(\(categoryColumns)),debts(\(debtColumns))"
+        "id,category_id,amount_cents,kind,note,spent_at,category:categories(\(categoryColumns)),debts(\(debtColumns))"
 
     /// Igual, pero solo gastos con al menos un compartido pendiente (`!inner` filtra los padres).
     static let expenseWithPendingDebtsColumns =
-        "id,category_id,amount_cents,currency,kind,note,spent_at,category:categories(\(categoryColumns)),debts!inner(\(debtColumns))"
+        "id,category_id,amount_cents,kind,note,spent_at,category:categories(\(categoryColumns)),debts!inner(\(debtColumns))"
 }
 
 /// Parámetros de la función `save_expense` (ver supabase/schema.sql).
@@ -29,7 +29,6 @@ nonisolated struct ExpensePayload: Encodable, Sendable {
     let id: UUID
     let category_id: UUID
     let amount_cents: Int
-    let currency: String
     let kind: String
     let note: String?
     let spent_at: String
@@ -38,7 +37,6 @@ nonisolated struct ExpensePayload: Encodable, Sendable {
         id = e.id
         category_id = e.categoryId
         amount_cents = e.amountCents
-        currency = e.currency
         kind = e.kind.rawValue
         note = e.note
         spent_at = JSONCoding.iso8601String(e.spentAt)
