@@ -5,9 +5,8 @@ import Foundation
 nonisolated struct SupabaseConfig: Sendable {
     let url: URL
     let anonKey: String
-    /// Usuario de prueba de la Fase 2 (inicio de sesión silencioso). Se elimina en la Fase 4.
-    let devUserEmail: String
-    let devUserPassword: String
+    /// OAuth client ID de Google (tipo iOS). nil = no se muestra "Continuar con Google".
+    let googleIOSClientID: String?
 
     /// nil si falta algún valor o siguen los placeholders de Secrets.example.xcconfig.
     static func fromBundle(_ bundle: Bundle = .main) -> SupabaseConfig? {
@@ -21,11 +20,10 @@ nonisolated struct SupabaseConfig: Sendable {
 
         guard let urlString = value("SupabaseURL"),
               let url = URL(string: urlString), url.scheme == "https", url.host != nil,
-              let anonKey = value("SupabaseAnonKey"),
-              let email = value("DevUserEmail"),
-              let password = value("DevUserPassword")
+              let anonKey = value("SupabaseAnonKey")
         else { return nil }
 
-        return SupabaseConfig(url: url, anonKey: anonKey, devUserEmail: email, devUserPassword: password)
+        let google = value("GoogleIOSClientID").flatMap { $0.hasSuffix(".apps.googleusercontent.com") ? $0 : nil }
+        return SupabaseConfig(url: url, anonKey: anonKey, googleIOSClientID: google)
     }
 }

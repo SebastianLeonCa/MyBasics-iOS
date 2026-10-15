@@ -43,7 +43,18 @@ struct UserFacingError: Identifiable {
             }
         }
         if let auth = error as? AuthError {
-            return String(localized: "No se pudo iniciar sesión con el usuario de prueba (\(auth.message)). Revisa DEV_USER_EMAIL y DEV_USER_PASSWORD.")
+            switch auth.errorCode {
+            case .invalidCredentials: return String(localized: "Email o contraseña incorrectos.")
+            case .emailNotConfirmed: return String(localized: "Confirma tu correo: te enviamos un enlace al registrarte.")
+            case .userAlreadyExists, .emailExists: return String(localized: "Ya existe una cuenta con ese email. Inicia sesión.")
+            case .weakPassword: return String(localized: "La contraseña es muy débil. Usa al menos 8 caracteres.")
+            case .samePassword: return String(localized: "La nueva contraseña debe ser distinta a la anterior.")
+            case .overEmailSendRateLimit, .overRequestRateLimit:
+                return String(localized: "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.")
+            case .providerDisabled: return String(localized: "Este método de inicio de sesión no está habilitado en Supabase.")
+            case .sessionNotFound, .badJWT: return String(localized: "Tu sesión expiró. Vuelve a iniciar sesión.")
+            default: return auth.message
+            }
         }
         if error is DecodingError {
             return String(localized: "La respuesta del servidor no tiene el formato esperado.")
