@@ -28,9 +28,9 @@ Apple Developer Program (99 USD/año).
 | ✅ | **Eliminar cuenta dentro de la app** (guía 5.1.1(v)) | Ajustes › Eliminar cuenta |
 | ✅ | Sin credenciales en el código ni en Git | `Secrets.xcconfig` en `.gitignore` |
 | ✅ | Solo HTTPS (Supabase) | — |
-| ⬜ 🤖 | **Manifiesto de privacidad** `PrivacyInfo.xcprivacy` (obligatorio desde 2024). La app no rastrea, no usa APIs de "razón obligatoria" y declara los datos que recopila (ver C.2). | por crear |
-| ⬜ 🤖 | **Cifrado:** agregar `ITSAppUsesNonExemptEncryption = NO` al Info.plist (solo usa el HTTPS del sistema). Evita la pregunta en cada subida. | por agregar |
-| ⬜ 🤖 | **Solo iPhone y solo vertical.** Hoy el proyecto declara iPhone **y iPad** y permite horizontal. Si queda iPad, Apple exige capturas de iPad y que se vea bien ahí. Recomiendo `TARGETED_DEVICE_FAMILY = 1` y solo *Portrait*. | por decidir |
+| ✅ | **Manifiesto de privacidad** `PrivacyInfo.xcprivacy` (obligatorio desde 2024). La app no rastrea, no usa APIs de "razón obligatoria" y declara los datos que recopila (ver C.2). | `Resources/PrivacyInfo.xcprivacy` |
+| ✅ | **Cifrado:** agregar `ITSAppUsesNonExemptEncryption = NO` al Info.plist (solo usa el HTTPS del sistema). Evita la pregunta en cada subida. | `Config/Info.plist` |
+| ✅ | **Solo iPhone y solo vertical** (`TARGETED_DEVICE_FAMILY = 1`, solo *Portrait*). Así no hacen falta capturas de iPad. | `project.pbxproj` |
 | ⬜ 🧑 | **Bundle ID definitivo** (hoy `sleonca.MyBasics`). Se recomienda formato `com.tunombre.mybasics`; **no se puede cambiar** después de publicar. | por decidir |
 | ⬜ 🧑 | Versión `1.0` (`MARKETING_VERSION`) y build `1` (`CURRENT_PROJECT_VERSION`). **Sube el build** en cada envío a TestFlight. | ✅ valores iniciales |
 | ✅ | **Login de terceros (guía 4.8):** hoy el login es solo con email, así que no aplica. Si activas Google, Apple exige ofrecer también Sign in with Apple (o una opción equivalente en privacidad) → activa los dos juntos. | — |

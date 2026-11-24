@@ -26,6 +26,9 @@
 	<!-- La app es solo de modo oscuro. -->
 	<key>UIUserInterfaceStyle</key>
 	<string>Dark</string>
+	<!-- Solo usa el HTTPS del sistema: exento de declarar cifrado en cada subida. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
