@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Se combina con el Info.plist generado por Xcode. Los valores vienen de Config/Secrets.xcconfig. -->
+<plist version="1.0">
+<dict>
+	<key>SupabaseURL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SupabaseAnonKey</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+	<key>AppleSignInEnabled</key>
+	<string>$(APPLE_SIGN_IN)</string>
+	<key>GoogleIOSClientID</key>
+	<string>$(GOOGLE_IOS_CLIENT_ID)</string>
+	<!-- mybasics:// recibe los enlaces de confirmación de correo y de recuperar contraseña. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).auth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mybasics</string>
+			</array>
+		</dict>
+	</array>
+	<!-- La app es solo de modo oscuro. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
+	<!-- Solo usa el HTTPS del sistema: exento de declarar cifrado en cada subida. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchLogo</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

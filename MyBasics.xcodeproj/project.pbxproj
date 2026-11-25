@@ -6,8 +6,27 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		049259C2308003C000542364 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 049259C1308003C000542364 /* Supabase */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		049259B7308003C000542364 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 04925979308003BF00542364 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 04925980308003BF00542364;
+			remoteInfo = MyBasics;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		04925981308003BF00542364 /* MyBasics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyBasics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		049259A0308003C000542364 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		049259A1308003C000542364 /* Secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.example.xcconfig; sourceTree = "<group>"; };
+		049259B1308003C000542364 /* MyBasicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyBasicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		049259C3308003C000542364 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		049259D0308003C000542364 /* MyBasics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyBasics.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +35,21 @@
 			path = MyBasics;
 			sourceTree = "<group>";
 		};
+		049259B2308003C000542364 /* MyBasicsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MyBasicsTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0492597E308003BF00542364 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				049259C2308003C000542364 /* Supabase in Frameworks */,
+			);
+		};
+		049259B4308003C000542364 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -30,7 +60,9 @@
 		04925978308003BF00542364 = {
 			isa = PBXGroup;
 			children = (
+				049259A2308003C000542364 /* Config */,
 				04925983308003BF00542364 /* MyBasics */,
+				049259B2308003C000542364 /* MyBasicsTests */,
 				04925982308003BF00542364 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,8 +71,20 @@
 			isa = PBXGroup;
 			children = (
 				04925981308003BF00542364 /* MyBasics.app */,
+				049259B1308003C000542364 /* MyBasicsTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		049259A2308003C000542364 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				049259A0308003C000542364 /* Base.xcconfig */,
+				049259A1308003C000542364 /* Secrets.example.xcconfig */,
+				049259C3308003C000542364 /* Info.plist */,
+				049259D0308003C000542364 /* MyBasics.entitlements */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -60,9 +104,33 @@
 				04925983308003BF00542364 /* MyBasics */,
 			);
 			name = MyBasics;
+			packageProductDependencies = (
+				049259C1308003C000542364 /* Supabase */,
+			);
 			productName = MyBasics;
 			productReference = 04925981308003BF00542364 /* MyBasics.app */;
 			productType = "com.apple.product-type.application";
+		};
+		049259B0308003C000542364 /* MyBasicsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 049259B8308003C000542364 /* Build configuration list for PBXNativeTarget "MyBasicsTests" */;
+			buildPhases = (
+				049259B3308003C000542364 /* Sources */,
+				049259B4308003C000542364 /* Frameworks */,
+				049259B5308003C000542364 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				049259B6308003C000542364 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				049259B2308003C000542364 /* MyBasicsTests */,
+			);
+			name = MyBasicsTests;
+			productName = MyBasicsTests;
+			productReference = 049259B1308003C000542364 /* MyBasicsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -77,29 +145,43 @@
 					04925980308003BF00542364 = {
 						CreatedOnToolsVersion = 27.0;
 					};
+					049259B0308003C000542364 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 04925980308003BF00542364;
+					};
 				};
 			};
 			buildConfigurationList = 0492597C308003BF00542364 /* Build configuration list for PBXProject "MyBasics" */;
-			developmentRegion = en;
+			developmentRegion = es;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				es,
 				en,
 				Base,
 			);
 			mainGroup = 04925978308003BF00542364;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04925982308003BF00542364 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				04925980308003BF00542364 /* MyBasics */,
+				049259B0308003C000542364 /* MyBasicsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		0492597F308003BF00542364 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		049259B5308003C000542364 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -112,7 +194,20 @@
 			files = (
 			);
 		};
+		049259B3308003C000542364 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		049259B6308003C000542364 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 04925980308003BF00542364 /* MyBasics */;
+			targetProxy = 049259B7308003C000542364 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0492598A308003C000542364 /* Debug configuration for PBXProject "MyBasics" */ = {
@@ -168,7 +263,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -226,7 +321,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -238,19 +333,20 @@
 		};
 		0492598D308003C000542364 /* Debug configuration for PBXNativeTarget "MyBasics" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 049259A0308003C000542364 /* Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "$(MYBASICS_ENTITLEMENTS_$(APPLE_SIGN_IN))";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R56B22BBKJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -264,25 +360,26 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		0492598E308003C000542364 /* Release configuration for PBXNativeTarget "MyBasics" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 049259A0308003C000542364 /* Base.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "$(MYBASICS_ENTITLEMENTS_$(APPLE_SIGN_IN))";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R56B22BBKJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,7 +393,49 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		049259B9308003C000542364 /* Debug configuration for PBXNativeTarget "MyBasicsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R56B22BBKJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sleonca.MyBasicsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyBasics.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyBasics";
+			};
+			name = Debug;
+		};
+		049259BA308003C000542364 /* Release configuration for PBXNativeTarget "MyBasicsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R56B22BBKJ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = sleonca.MyBasicsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MyBasics.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MyBasics";
 			};
 			name = Release;
 		};
@@ -319,7 +458,34 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		049259B8308003C000542364 /* Build configuration list for PBXNativeTarget "MyBasicsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				049259B9308003C000542364 /* Debug configuration for PBXNativeTarget "MyBasicsTests" */,
+				049259BA308003C000542364 /* Release configuration for PBXNativeTarget "MyBasicsTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 2.55.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		049259C1308003C000542364 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 049259C0308003C000542364 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 04925979308003BF00542364 /* Project object */;
 	validationLevel = 1;

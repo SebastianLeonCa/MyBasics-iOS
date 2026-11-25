@@ -1,0 +1,13 @@
+// Configuración base del target MyBasics.
+
+// Sign in with Apple requiere el Apple Developer Program (pagado). Por defecto está apagado:
+// la app se firma sin esa capacidad (sirve con un Apple ID gratuito) y el botón no aparece.
+// Para activarlo, pon APPLE_SIGN_IN = YES en Config/Secrets.xcconfig.
+APPLE_SIGN_IN = NO
+
+// Incluye los secretos locales si existen (el "?" evita fallar si falta el archivo).
+#include? "Secrets.xcconfig"
+
+// Entitlements según el interruptor (CODE_SIGN_ENTITLEMENTS usa MYBASICS_ENTITLEMENTS_$(APPLE_SIGN_IN)).
+MYBASICS_ENTITLEMENTS_YES = Config/MyBasics.entitlements
+MYBASICS_ENTITLEMENTS_NO =

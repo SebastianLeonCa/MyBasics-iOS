@@ -1,0 +1,143 @@
+import SwiftUI
+
+/// "Compartidos": gastos que dividiste con alguien. Agrupado por persona con su saldo neto.
+struct SharedView: View {
+    @State private var viewModel: SharedViewModel
+    @Environment(\.currency) private var currency
+
+    init(repository: any ExpenseRepository) {
+        _viewModel = State(initialValue: SharedViewModel(repository: repository))
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Group {
+                    Section {
+                        HStack(spacing: 12) {
+                            totalTile(title: "Te deben", cents: viewModel.owedToMeCents, color: Theme.positive,
+                                      icon: "arrow.down.left")
+                            totalTile(title: "Debes", cents: viewModel.iOweCents, color: Theme.negative,
+                                      icon: "arrow.up.right")
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                    }
+
+                    if let loadError = viewModel.loadError {
+                        LoadErrorView(message: loadError) { await viewModel.load() }
+                    } else if !viewModel.hasLoaded {
+                        Section { SkeletonRows(count: 3) }
+                    } else if viewModel.shares.isEmpty {
+                        ContentUnavailableView(
+                            "Todo al día",
+                            systemImage: "checkmark.circle",
+                            description: Text("Cuando compartas un gasto con alguien, aparecerá aquí hasta que se pague.")
+                        )
+                    } else {
+                        ForEach(viewModel.balances) { balance in
+                            Section {
+                                ForEach(balance.items) { share in
+                                    row(share)
+                                }
+                            } header: {
+                                header(for: balance)
+                            }
+                        }
+                    }
+                }
+                .themedRows()
+            }
+            .navigationTitle("Compartidos")
+            .themedScreen()
+            .task { await viewModel.load() }
+            .refreshable { await viewModel.load() }
+            .sensoryFeedback(.success, trigger: viewModel.paidFeedback)
+            .sensoryFeedback(.error, trigger: viewModel.errorFeedback)
+            .errorAlert($viewModel.alert)
+        }
+    }
+
+    private func header(for balance: PersonBalance) -> some View {
+        let amount = CurrencyFormatter.string(
+            fromCents: abs(balance.netCents),
+            currency: currency)
+        return HStack {
+            Text(verbatim: balance.name)
+            Spacer()
+            Group {
+                if balance.netCents > 0 {
+                    Text("Te debe \(amount)").foregroundStyle(Theme.positive)
+                } else if balance.netCents < 0 {
+                    Text("Le debes \(amount)").foregroundStyle(Theme.negative)
+                } else {
+                    Text("A mano")
+                }
+            }
+            .monospacedDigit()
+        }
+    }
+
+    private func totalTile(title: LocalizedStringKey, cents: Int, color: Color, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(title, systemImage: icon)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(color)
+            Text(CurrencyFormatter.string(fromCents: cents, currency: currency))
+                .font(Theme.amount(.title2))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .contentTransition(.numericText())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+        .accessibilityElement(children: .combine)
+    }
+
+    private func row(_ share: PendingShare) -> some View {
+        let theyOweMe = share.debt.direction == .theyOweMe
+        return HStack(spacing: 12) {
+            CategoryIcon(
+                icon: share.expense.category?.icon ?? "tag",
+                colorHex: share.expense.category?.colorHex ?? "#8E8E93",
+                size: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: share.expense.displayTitle)
+                    .font(.body)
+                    .lineLimit(1)
+                Text(share.expense.spentAt.formatted(.dateTime.day().month(.abbreviated)))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(CurrencyFormatter.string(fromCents: share.debt.amountCents, currency: currency))
+                    .font(Theme.amount(.body, weight: .semibold))
+                Text(verbatim: share.debt.direction.displayName)
+                    .font(.caption)
+                    .foregroundStyle(theyOweMe ? Theme.positive : Theme.negative)
+            }
+            Button {
+                Task { await viewModel.markPaid(share) }
+            } label: {
+                Image(systemName: "checkmark.circle")
+                    .font(.title2)
+                    .foregroundStyle(Theme.accent)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Marcar como pagado")
+        }
+        .swipeActions(edge: .trailing) {
+            Button {
+                Task { await viewModel.markPaid(share) }
+            } label: {
+                Label("Pagado", systemImage: "checkmark")
+            }
+            .tint(Theme.accentDeep)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAction(named: "Marcar como pagado") {
+            Task { await viewModel.markPaid(share) }
+        }
+    }
+}

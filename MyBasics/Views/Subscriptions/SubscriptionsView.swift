@@ -1,0 +1,104 @@
+import SwiftUI
+
+/// Suscripciones deducidas de los gastos de la categoría Suscripciones.
+/// Activa = tuvo un cobro en los últimos 35 días.
+struct SubscriptionsView: View {
+    @State private var viewModel: SubscriptionsViewModel
+    @Environment(\.currency) private var currency
+
+    init(repository: any ExpenseRepository) {
+        _viewModel = State(initialValue: SubscriptionsViewModel(repository: repository))
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Group {
+                    Section {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Gasto mensual en suscripciones")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Text(CurrencyFormatter.string(
+                                fromCents: viewModel.monthlyTotalCents,
+                                currency: currency))
+                                .font(Theme.amount(.largeTitle))
+                                .foregroundStyle(Theme.accent)
+                                .contentTransition(.numericText())
+                            Text("\(viewModel.active.count) activas")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                        .accessibilityElement(children: .combine)
+                    }
+
+                    if let loadError = viewModel.loadError {
+                        LoadErrorView(message: loadError) { await viewModel.load() }
+                    } else if !viewModel.hasLoaded {
+                        Section { SkeletonRows(count: 3) }
+                    } else if viewModel.summaries.isEmpty {
+                        ContentUnavailableView(
+                            "Sin suscripciones",
+                            systemImage: "repeat.circle",
+                            description: Text("Registra un gasto en la categoría Suscripciones (por ejemplo, Netflix) y aparecerá aquí.")
+                        )
+                    } else {
+                        if !viewModel.active.isEmpty {
+                            Section("Activas") {
+                                ForEach(viewModel.active) { row($0) }
+                            }
+                        }
+                        if !viewModel.inactive.isEmpty {
+                            Section {
+                                ForEach(viewModel.inactive) { row($0) }
+                            } header: {
+                                Text("Inactivas")
+                            } footer: {
+                                Text("Sin cobros en los últimos \(SubscriptionAnalytics.activeWindowDays) días.")
+                            }
+                        }
+                    }
+                }
+                .themedRows()
+            }
+            .navigationTitle("Suscripciones")
+            .themedScreen()
+            .task { await viewModel.load() }
+            .refreshable { await viewModel.load() }
+
+        }
+    }
+
+    private func row(_ item: SubscriptionSummary) -> some View {
+        HStack(spacing: 12) {
+            CategoryIcon(icon: item.icon, colorHex: item.colorHex, size: 32)
+                .opacity(item.isActive ? 1 : 0.4)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: item.name)
+                    .font(.body)
+                Group {
+                    if item.isActive {
+                        Text("Próximo cobro ≈ \(item.nextChargeAt.formatted(.dateTime.day().month(.abbreviated)))")
+                    } else {
+                        Text("Último cobro: \(item.lastChargeAt.formatted(.dateTime.day().month(.abbreviated)))")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(CurrencyFormatter.string(fromCents: item.lastAmountCents, currency: currency))
+                    .font(Theme.amount(.body, weight: .semibold))
+                    .foregroundStyle(item.isActive ? .primary : .secondary)
+                if item.isActive {
+                    Text("al mes")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
