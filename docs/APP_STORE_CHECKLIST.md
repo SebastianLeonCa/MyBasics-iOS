@@ -17,7 +17,7 @@ Apple Developer Program (99 USD/año).
   Como cada rama contiene a las anteriores, basta un PR de `feat/fase-5-app-store` a `main`.
 - ✅ Tests unitarios pasando (⌘U) y SQL probado.
 - ⬜ 🧑 Ejecutar la última versión de `supabase/schema.sql` en Supabase.
-- ⬜ 🧑 **Rotar la secret key de Supabase** (estuvo en texto plano en un archivo del repo).
+- ✅ **Secret key de Supabase rotada** (la anterior quedó eliminada).
 
 ## B. Requisitos técnicos de Apple
 
