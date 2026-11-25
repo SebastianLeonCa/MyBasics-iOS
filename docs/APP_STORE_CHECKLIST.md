@@ -66,8 +66,9 @@ Respuestas que corresponden a lo que hace la app hoy:
 ### C.3 Capturas de pantalla
 - ⬜ 🧑 Mínimo **3**, máximo 10, para **iPhone 6.9"** (1320×2868 o 1290×2796 px). Con eso Apple
   reutiliza para tamaños menores. Si dejas iPad: también **iPad 13"**.
-- ⬜ 🤖 Puedo generarlas en el simulador **iPhone 17 Pro Max** con datos de ejemplo (sin tus datos reales):
-  Inicio con el gráfico, Nuevo gasto, Compartidos, Suscripciones y el login. En español e inglés.
+- ✅ Capturas en `screenshots/es` y `screenshots/en` (1320×2868, iPhone 18 Pro Max, datos de ejemplo sin marcas):
+  Inicio, Nuevo gasto, Compartidos, Suscripciones y Login. Para regenerarlas: lanzar la app (Debug) con
+  `-useMockData` y además `-screenshotTab shared|subscriptions`, `-screenshotAddExpense` o `-mockSignedOut`.
 
 ### C.4 Notas para el revisor de Apple
 - ⬜ 🧑 **Cuenta de prueba obligatoria** (la app pide login): crea en Supabase un usuario

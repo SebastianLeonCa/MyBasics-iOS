@@ -87,6 +87,17 @@
         }
       }
     },
+    "Almuerzo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lunch"
+          }
+        }
+      }
+    },
     "Apple no devolvió una credencial válida.": {
       "localizations": {
         "en": {
@@ -97,12 +108,45 @@
         }
       }
     },
+    "Arriendo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rent"
+          }
+        }
+      }
+    },
     "Ayer": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Yesterday"
+          }
+        }
+      }
+    },
+    "Bar": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bar"
+          }
+        }
+      }
+    },
+    "Café": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coffee"
           }
         }
       }
@@ -167,12 +211,34 @@
         }
       }
     },
+    "Cena con amigos": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinner with friends"
+          }
+        }
+      }
+    },
     "Cerrar sesión": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Sign out"
+          }
+        }
+      }
+    },
+    "Cine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Movies"
           }
         }
       }
@@ -245,6 +311,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Share %@"
+          }
+        }
+      }
+    },
+    "Compra semanal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly groceries"
+          }
+        }
+      }
+    },
+    "Concierto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concert"
           }
         }
       }
@@ -375,6 +463,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Too many attempts. Wait a few minutes and try again."
+          }
+        }
+      }
+    },
+    "Dentista": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dentist"
           }
         }
       }
@@ -579,12 +678,34 @@
         }
       }
     },
+    "Farmacia": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pharmacy"
+          }
+        }
+      }
+    },
     "Fecha": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Date"
+          }
+        }
+      }
+    },
+    "Ferretería": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hardware store"
           }
         }
       }
@@ -605,6 +726,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fixed"
+          }
+        }
+      }
+    },
+    "Gasolina": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gas"
           }
         }
       }
@@ -645,6 +777,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expenses by category"
+          }
+        }
+      }
+    },
+    "Gimnasio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gym"
           }
         }
       }
@@ -851,6 +994,17 @@
         }
       }
     },
+    "Lámpara": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lamp"
+          }
+        }
+      }
+    },
     "Marcar como pagado": {
       "localizations": {
         "en": {
@@ -887,6 +1041,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Next month"
+          }
+        }
+      }
+    },
+    "Metro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subway"
           }
         }
       }
@@ -947,6 +1112,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "At least %lld characters."
+          }
+        }
+      }
+    },
+    "Música": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Music"
           }
         }
       }
@@ -1101,6 +1277,17 @@
         }
       }
     },
+    "Nube": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud storage"
+          }
+        }
+      }
+    },
     "Nueva": {
       "localizations": {
         "en": {
@@ -1205,6 +1392,17 @@
         }
       }
     },
+    "Plan celular": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phone plan"
+          }
+        }
+      }
+    },
     "Por defecto": {
       "localizations": {
         "en": {
@@ -1245,6 +1443,17 @@
         }
       }
     },
+    "Regalo cumpleaños": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birthday gift"
+          }
+        }
+      }
+    },
     "Registra solo tu parte: ese monto es lo que debes. Al marcarlo como pagado, el gasto se mantiene y sale de lo que debes.": {
       "localizations": {
         "en": {
@@ -1281,6 +1490,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Repeat the password"
+          }
+        }
+      }
+    },
+    "Revista digital": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digital magazine"
           }
         }
       }
@@ -1407,6 +1627,28 @@
         }
       }
     },
+    "Snack": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snack"
+          }
+        }
+      }
+    },
+    "Streaming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming"
+          }
+        }
+      }
+    },
     "Supermercado": {
       "comment": "Nombre de categoría por defecto",
       "extractionState": "manual",
@@ -1440,6 +1682,17 @@
         }
       }
     },
+    "Sushi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sushi"
+          }
+        }
+      }
+    },
     "Sí": {
       "localizations": {
         "en": {
@@ -1456,6 +1709,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yes, sign out"
+          }
+        }
+      }
+    },
+    "Taxi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxi"
+          }
+        }
+      }
+    },
+    "Taxi al aeropuerto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxi to the airport"
           }
         }
       }

@@ -29,8 +29,10 @@ final class SubscriptionAnalyticsTests: XCTestCase {
         let now = F.date(2026, 10, 14, 15)
         let expenses = MockData.expenses(categories: MyBasics.Category.defaults, now: now)
         let summaries = SubscriptionAnalytics.summaries(from: expenses, now: now)
-        XCTAssertEqual(Set(summaries.filter(\.isActive).map(\.name)), ["Netflix", "Spotify", "iCloud+"])
-        XCTAssertEqual(summaries.filter { !$0.isActive }.map(\.name), ["Disney+"])
+        // Las descripciones de ejemplo se traducen según el idioma del simulador.
+        let l = { (key: String) in String(localized: String.LocalizationValue(key)) }
+        XCTAssertEqual(Set(summaries.filter(\.isActive).map(\.name)), [l("Streaming"), l("Música"), l("Nube")])
+        XCTAssertEqual(summaries.filter { !$0.isActive }.map(\.name), [l("Revista digital")])
     }
 }
 

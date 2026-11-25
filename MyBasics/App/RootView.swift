@@ -53,6 +53,17 @@ struct SignedInView: View {
             repository: environment.expenseRepository,
             cache: environment.expenseCache,
             userId: { auth.currentUserId }))
+        #if DEBUG
+        // Capturas para el App Store: -screenshotTab shared|subscriptions|settings, -screenshotAddExpense.
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-screenshotTab"), i + 1 < args.count,
+           let initial = AppTab.allCases.first(where: { "\($0)" == args[i + 1] }) {
+            _tab = State(initialValue: initial)
+        }
+        if args.contains("-screenshotAddExpense") {
+            _editor = State(initialValue: ExpenseEditorRoute(expense: nil))
+        }
+        #endif
     }
 
     var body: some View {
