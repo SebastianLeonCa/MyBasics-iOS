@@ -2,10 +2,10 @@
 
 # MyBasics
 
-**Tus gastos del día a día, en segundos.**
+**Your everyday spending, in seconds.**
 
-App para iPhone que registra tus gastos por categoría, te muestra en qué se va tu plata cada mes,
-lleva la cuenta de lo que te deben (y lo que debes) y vigila tus suscripciones.
+An iPhone app that tracks your expenses by category, shows where your money goes each month,
+keeps track of what others owe you (and what you owe them), and keeps an eye on your subscriptions.
 
 ![iOS 17+](https://img.shields.io/badge/iOS-17%2B-000000?logo=apple&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-F05138?logo=swift&logoColor=white)
@@ -13,58 +13,58 @@ lleva la cuenta de lo que te deben (y lo que debes) y vigila tus suscripciones.
 
 <br>
 
-<img src="screenshots/es/1-home.png" width="200" alt="Inicio: gráfico de gastos del mes por categoría">&nbsp;&nbsp;
-<img src="screenshots/es/2-add-expense.png" width="200" alt="Nuevo gasto">&nbsp;&nbsp;
-<img src="screenshots/es/3-shared.png" width="200" alt="Compartidos: quién te debe y a quién le debes">&nbsp;&nbsp;
-<img src="screenshots/es/4-subscriptions.png" width="200" alt="Suscripciones activas e inactivas">
+<img src="screenshots/en/1-home.png" width="200" alt="Home: monthly spending chart by category">&nbsp;&nbsp;
+<img src="screenshots/en/2-add-expense.png" width="200" alt="New expense">&nbsp;&nbsp;
+<img src="screenshots/en/3-shared.png" width="200" alt="Shared: who owes you and who you owe">&nbsp;&nbsp;
+<img src="screenshots/en/4-subscriptions.png" width="200" alt="Active and inactive subscriptions">
 
 </div>
 
-## Qué hace
+## Features
 
-- 🍩 **Resumen del mes** con un gráfico por categoría, filtrable entre gastos fijos y variables.
-- ⚡ **Agregar un gasto en segundos**: monto, categoría y listo. La descripción es opcional.
-- 🤝 **Gastos compartidos**: anota quién te debe y a quién le debes, y márcalo como pagado.
-- 🔁 **Suscripciones**: cuánto pagas al mes, el próximo cobro estimado y cuáles dejaste de pagar.
-- 🗂️ **Categorías propias** con ícono y color.
-- 📤 **Exportar a CSV** tus gastos.
-- 🔐 **Cuenta con email**, sincronizada en la nube. Puedes eliminarla desde la app.
-- 🌎 Español e inglés · modo oscuro.
+- **Monthly overview** with a chart by category, filterable by fixed and variable expenses.
+- **Add an expense in seconds**: amount, category, done. The description is optional.
+- **Shared expenses**: track who owes you and who you owe, and mark them as settled.
+- **Subscriptions**: how much you pay per month, the estimated next charge, and which ones you stopped paying.
+- **Custom categories** with their own icon and color.
+- **CSV export** of your expenses.
+- **Email account**, synced to the cloud. You can delete it from within the app.
+- Spanish and English, dark mode.
 
-## Cómo está hecha
+## How it's built
 
 | | |
 | --- | --- |
-| **UI** | SwiftUI, arquitectura MVVM |
-| **Backend** | [Supabase](https://supabase.com) (Auth + Postgres con Row Level Security) |
-| **Datos sin conexión** | Caché local del mes en curso, guardado optimista |
-| **Tests** | XCTest (lógica de gastos, compartidos, suscripciones, CSV, auth) |
+| **UI** | SwiftUI, MVVM architecture |
+| **Backend** | [Supabase](https://supabase.com) (Auth + Postgres with Row Level Security) |
+| **Offline** | Local cache of the current month, optimistic saves |
+| **Tests** | XCTest (expenses, shared balances, subscriptions, CSV, auth) |
 
 ```
 MyBasics/
-├── App/          # Entrada de la app y contenedor de dependencias
-├── Models/       # Expense, Category, Debt…
-├── ViewModels/   # Lógica de cada pantalla y analítica
-├── Views/        # Pantallas y componentes SwiftUI
-├── Services/     # Repositorios Supabase y Mock
+├── App/          # App entry point and dependency container
+├── Models/       # Expense, Category, Debt...
+├── ViewModels/   # Screen logic and analytics
+├── Views/        # SwiftUI screens and components
+├── Services/     # Supabase and mock repositories
 └── Utilities/
-supabase/schema.sql   # Tablas, políticas RLS y funciones
+supabase/schema.sql   # Tables, RLS policies and functions
 ```
 
-## Correrla en local
+## Running it locally
 
-1. Abre `MyBasics.xcodeproj` en Xcode y dale ▶︎.
-   **Sin configurar nada, la app arranca con datos de ejemplo**, así que puedes probarla de inmediato.
-2. Para usar tu propio backend, copia `Config/Secrets.example.xcconfig` como `Config/Secrets.xcconfig`
-   (está en `.gitignore`) y completa la URL y la *publishable/anon key* de tu proyecto de Supabase.
-   Luego ejecuta `supabase/schema.sql` en el SQL Editor. Paso a paso en [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md).
+1. Open `MyBasics.xcodeproj` in Xcode and press Run.
+   **With no configuration, the app starts with sample data**, so you can try it right away.
+2. To use your own backend, copy `Config/Secrets.example.xcconfig` to `Config/Secrets.xcconfig`
+   (it is in `.gitignore`) and fill in your Supabase project URL and *publishable/anon key*.
+   Then run `supabase/schema.sql` in the SQL Editor. Step by step in [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md) (Spanish).
 
-> ⚠️ Nunca pongas la *secret* / *service_role* key en la app: saltan las reglas de seguridad de la base de datos.
+> **Note:** Never put the *secret* / *service_role* key in the app: it bypasses the database security rules.
 
-## Más documentación
+## More documentation (Spanish)
 
-- [Configurar Supabase](docs/SUPABASE_SETUP.md)
-- [Configurar el inicio de sesión](docs/AUTH_SETUP.md)
-- [Instalar en tu iPhone gratis](docs/INSTALAR_EN_IPHONE.md)
-- [Checklist para el App Store](docs/APP_STORE_CHECKLIST.md)
-- [Política de privacidad](docs/PRIVACY_POLICY.md)
+- [Supabase setup](docs/SUPABASE_SETUP.md)
+- [Sign-in setup](docs/AUTH_SETUP.md)
+- [Install on your iPhone for free](docs/INSTALAR_EN_IPHONE.md)
+- [App Store checklist](docs/APP_STORE_CHECKLIST.md)
+- [Privacy policy](docs/PRIVACY_POLICY.md)
